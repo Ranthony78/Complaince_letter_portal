@@ -1,0 +1,284 @@
+<!-- templates/documents/document_list.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ doc_type_display }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.documents-header {
+    margin-bottom: 24px;
+}
+
+.documents-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.documents-header p {
+    color: var(--gray-color);
+    margin-top: 8px;
+}
+
+.filter-bar {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-bar input,
+.filter-bar select {
+    padding: 10px 16px;
+    border: 2px solid var(--gray-light);
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.filter-bar input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-bar select {
+    width: 150px;
+}
+
+.documents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.document-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.document-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.document-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.document-icon i {
+    font-size: 24px;
+    color: var(--primary-color);
+}
+
+.document-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.document-description {
+    font-size: 13px;
+    color: var(--gray-color);
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.document-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--gray-color);
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-light);
+}
+
+.document-version {
+    background: var(--light-color);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.document-type-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: var(--light-color);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 24px;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.empty-icon i {
+    font-size: 40px;
+    color: var(--primary-color);
+}
+</style>
+{% endblock %}
+
+{% block page_title %}{{ doc_type_display }}{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item active">{{ doc_type_display }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="documents-header">
+    <h2>{{ doc_type_display }}</h2>
+    <p>Browse and access {{ doc_type_display|lower }} documents</p>
+</div>
+
+<div class="filter-bar">
+    <input type="text" id="searchDocs" placeholder="Search documents...">
+    <select id="sortDocs">
+        <option value="title">Sort by Title</option>
+        <option value="newest">Sort by Newest</option>
+        <option value="oldest">Sort by Oldest</option>
+    </select>
+</div>
+
+<div class="documents-grid" id="documentsGrid">
+    {% for doc in documents %}
+    <div class="document-card"
+         data-title="{{ doc.title|lower }}"
+         data-date="{{ doc.created_at|date:'Y-m-d' }}"
+         onclick="window.location.href='{% url 'documents:view' doc.id %}'">
+        <div class="document-type-badge">{{ doc.get_document_type_display }}</div>
+        <div class="document-icon">
+            <i class="fas fa-file-pdf"></i>
+        </div>
+        <div class="document-title">{{ doc.title }}</div>
+        <div class="document-description">{{ doc.description|truncatechars:80 }}</div>
+        <div class="document-meta">
+            <span class="document-version">v{{ doc.version }}</span>
+            <span>{{ doc.updated_at|date:"M d, Y" }}</span>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-folder-open"></i>
+        </div>
+        <h4>No documents found</h4>
+        <p>No {{ doc_type_display|lower }} documents are currently available.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+<script>
+// Search functionality
+const searchInput = document.getElementById('searchDocs');
+const sortSelect = document.getElementById('sortDocs');
+const grid = document.getElementById('documentsGrid');
+let cards = Array.from(document.querySelectorAll('.document-card'));
+
+function filterDocuments() {
+    const searchTerm = searchInput.value.toLowerCase();
+
+    cards.forEach(card => {
+        const title = card.dataset.title;
+        if (title.includes(searchTerm)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    // Update visible cards array
+    cards = Array.from(document.querySelectorAll('.document-card:not([style*="display: none"])'));
+}
+
+function sortDocuments() {
+    const sortBy = sortSelect.value;
+
+    if (sortBy === 'title') {
+        cards.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+    } else if (sortBy === 'newest') {
+        cards.sort((a, b) => new Date(b.dataset.date) - new Date(a.dataset.date));
+    } else if (sortBy === 'oldest') {
+        cards.sort((a, b) => new Date(a.dataset.date) - new Date(b.dataset.date));
+    }
+
+    cards.forEach(card => grid.appendChild(card));
+}
+
+searchInput.addEventListener('keyup', () => {
+    filterDocuments();
+    sortDocuments();
+});
+
+sortSelect.addEventListener('change', sortDocuments);
+</script>
+{% endblock %}

@@ -1,0 +1,1183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit {{ letter.letter_code }} - FACS Letter{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+.form-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.form-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.form-header {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.form-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-header h3 i {
+    color: var(--primary-color);
+    font-size: 20px;
+}
+
+.form-body {
+    padding: 25px;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -12px 20px;
+}
+
+.form-col {
+    flex: 1;
+    padding: 0 12px;
+    min-width: 200px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-label .required {
+    color: var(--danger-color);
+    margin-left: 4px;
+}
+
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid var(--gray-light);
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+    background: var(--light-color);
+    width: 100%;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+    background: white;
+}
+
+.form-control[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.radio-option input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.radio-option label {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--dark-color);
+}
+
+.version-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.btn-submit, .btn-draft, .btn-update, .btn-cancel {
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    color: white;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-draft {
+    background: white;
+    border: 2px solid var(--gray-light);
+    color: var(--gray-color);
+}
+
+.btn-draft:hover {
+    border-color: var(--warning-color);
+    color: var(--warning-color);
+}
+
+.btn-update {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.btn-update:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.btn-cancel {
+    background: white;
+    border: 2px solid var(--gray-light);
+    color: var(--gray-color);
+}
+
+.btn-cancel:hover {
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+.help-text {
+    font-size: 11px;
+    color: var(--gray-color);
+    margin-top: 5px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-draft {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.status-radius_pending, .status-sessions_pending, .status-client_pending, .status-cco_review {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-completed {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Client Approval Styles */
+.client-grid-three {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.client-card {
+    background: var(--light-color);
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid var(--gray-light);
+    transition: all 0.3s ease;
+}
+
+.client-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.client-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.client-header input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.client-header label {
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0;
+    font-size: 14px;
+    color: var(--dark-color);
+}
+
+/* Document list styles */
+.document-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: 1px solid var(--gray-light);
+    border-radius: 12px;
+}
+
+.document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid var(--gray-light);
+    transition: all 0.3s ease;
+}
+
+.document-item:hover {
+    background: var(--light-color);
+}
+
+.document-item:last-child {
+    border-bottom: none;
+}
+
+.document-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.document-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(102, 126, 234, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.document-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.document-meta {
+    font-size: 11px;
+    color: var(--gray-color);
+}
+
+.document-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-doc {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-download {
+    background: var(--light-color);
+    color: var(--primary-color);
+    border: 1px solid var(--gray-light);
+}
+
+.btn-download:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-edit {
+    background: var(--light-color);
+    color: var(--warning-color);
+    border: 1px solid var(--gray-light);
+}
+
+.btn-edit:hover {
+    background: var(--warning-color);
+    color: white;
+}
+
+.upload-area {
+    border: 2px dashed var(--gray-light);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background: rgba(102, 126, 234, 0.02);
+}
+
+.upload-area i {
+    font-size: 48px;
+    color: var(--gray-color);
+    margin-bottom: 15px;
+}
+
+.upload-area p {
+    margin-bottom: 5px;
+}
+
+.version-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.version-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.version-item:last-child {
+    border-bottom: none;
+}
+
+.version-info {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.version-badge {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.new-upload-section {
+    margin-top: 20px;
+    border-top: 1px solid var(--gray-light);
+    padding-top: 20px;
+}
+
+.document-description {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+    padding-left: 5px;
+    border-left: 2px solid var(--primary-color);
+}
+
+.upload-info-alert {
+    background: #e3f2fd;
+    border-left: 4px solid var(--primary-color);
+    padding: 12px 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.upload-info-alert i {
+    color: var(--primary-color);
+    font-size: 20px;
+}
+
+.upload-info-alert strong {
+    color: var(--dark-color);
+}
+
+.cancel-upload-btn {
+    background: #f8f9fa;
+    border: 1px solid var(--gray-light);
+    color: var(--gray-color);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.cancel-upload-btn:hover {
+    background: #e9ecef;
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+@media (max-width: 992px) {
+    .client-grid-three {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .form-row {
+        flex-direction: column;
+    }
+    .form-col {
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .client-grid-three {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block page_title %}Edit {{ letter.letter_code }} (FACS){% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:list' %}">Letters</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:facs_detail' object.id %}">{{ object.letter_code }}</a></li>
+<li class="breadcrumb-item active">Edit</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <span class="status-badge status-{{ letter.status|lower }}">
+        <i class="fas fa-{% if letter.status == 'Draft' %}pencil-alt{% elif letter.status == 'Completed' %}check-circle{% else %}clock{% endif %} me-1"></i>
+        {{ letter.get_status_display }}
+    </span>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <form method="post" enctype="multipart/form-data" id="editForm">
+        {% csrf_token %}
+
+        <!-- Section 1: Basic Information -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+            </div>
+            <div class="form-body">
+                <!-- Row 1: Communication Code Field (LOCKED) -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">
+                            Letter/Email/SMS Code
+                            <span class="version-tag">Version Identifier</span>
+                        </label>
+                        <input type="text" class="form-control" value="{{ letter.communication_code|default:letter.letter_code }}" readonly disabled>
+                        <input type="hidden" name="communication_code" value="{{ letter.communication_code|default:letter.letter_code }}">
+                        <div class="help-text">
+                            <i class="fas fa-lock me-1"></i>
+                            This code is locked and cannot be changed.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Communication Type + Creation/Revision -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Communication Type</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="communication_type" value="Letter" id="type_letter" {% if letter.communication_type == 'Letter' %}checked{% endif %}>
+                                <label for="type_letter">Letter</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="communication_type" value="Email" id="type_email" {% if letter.communication_type == 'Email' %}checked{% endif %}>
+                                <label for="type_email">Email</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="communication_type" value="SMS" id="type_sms" {% if letter.communication_type == 'SMS' %}checked{% endif %}>
+                                <label for="type_sms">SMS</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Creation/Revision</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="creation_type" value="Creation" id="creation" {% if letter.creation_type == 'Creation' %}checked{% endif %}>
+                                <label for="creation">Creation</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="creation_type" value="Revision" id="revision" {% if letter.creation_type == 'Revision' %}checked{% endif %}>
+                                <label for="revision">Revision</label>
+                            </div>
+                        </div>
+                        <div class="help-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Select "Creation" for new letters or "Revision" for updates
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Creation/Revision Date + Regulatory + Timing -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Creation/Revision Date</label>
+                        <input type="date" name="creation_date" class="form-control datepicker" value="{{ letter.creation_revision_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Regulatory</label>
+                        <select name="regulatory" class="form-select">
+                            <option value="">Select</option>
+                            <option value="Yes" {% if letter.regulatory == 'Yes' %}selected{% endif %}>Yes</option>
+                            <option value="No" {% if letter.regulatory == 'No' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Timing</label>
+                        <select name="timing" class="form-select">
+                            <option value="">Select</option>
+                            <option value="Initial" {% if letter.timing == 'Initial' %}selected{% endif %}>Initial</option>
+                            <option value="Subsequent" {% if letter.timing == 'Subsequent' %}selected{% endif %}>Subsequent</option>
+                            <option value="Seasonal" {% if letter.timing == 'Seasonal' %}selected{% endif %}>Seasonal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 4: Letter/Email/SMS + Letter Code -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Letter/Email/SMS</label>
+                        <select name="communication_subtype" class="form-select">
+                            <option value="">Select</option>
+                            <option value="Letter" {% if letter.communication_subtype == 'Letter' %}selected{% endif %}>Letter</option>
+                            <option value="Email" {% if letter.communication_subtype == 'Email' %}selected{% endif %}>Email</option>
+                            <option value="SMS" {% if letter.communication_subtype == 'SMS' %}selected{% endif %}>SMS</option>
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Letter Code</label>
+                        <input type="text" name="letter_code" class="form-control" value="{{ letter.letter_code }}">
+                        <div class="help-text">Unique identifier for this letter</div>
+                    </div>
+                </div>
+
+                <!-- Row 5: Priority + Production Date + Source -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Priority</label>
+                        <select name="priority" class="form-select">
+                            <option value="">Select</option>
+                            <option value="Low" {% if letter.priority == 'Low' %}selected{% endif %}>Low</option>
+                            <option value="Medium" {% if letter.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                            <option value="High" {% if letter.priority == 'High' %}selected{% endif %}>High</option>
+                            <option value="Critical" {% if letter.priority == 'Critical' %}selected{% endif %}>Critical</option>
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Production Date</label>
+                        <input type="date" name="production_date" class="form-control datepicker" value="{{ letter.production_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Source</label>
+                        <select name="source" class="form-select">
+                            <option value="">Select</option>
+                            <option value="Internal" {% if letter.source == 'Internal' %}selected{% endif %}>Internal</option>
+                            <option value="LiveVox" {% if letter.source == 'LiveVox' %}selected{% endif %}>LiveVox</option>
+                            <option value="CompuMail" {% if letter.source == 'CompuMail' %}selected{% endif %}>CompuMail</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 6: Letter Description -->
+                <div class="form-group">
+                    <label class="form-label">Letter Description</label>
+                    <textarea name="letter_description" class="form-control" rows="4">{{ letter.letter_description }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Radius & Sessions Approval -->
+        <div class="form-card approval-section">
+            <div class="form-header">
+                <h3><i class="fas fa-radar"></i> Radius & Sessions Approval</h3>
+                <p class="text-muted small mb-0">Set approval dates</p>
+            </div>
+            <div class="form-body">
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">CCO or Representative</label>
+                        <select name="cco_representative" class="form-select select2">
+                            <option value="">Select CCO or Representative</option>
+                            {% for user in cco_users %}
+                            <option value="{{ user.id }}" {% if radius_approval and radius_approval.cco_or_representative.id == user.id %}selected{% endif %}>
+                                {{ user.get_full_name|default:user.username }}
+                                {% if user.role == 'CCO' %} (CCO){% elif user.role == 'Representative' %} (Representative){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Radius Approval Date</label>
+                        <input type="date" name="radius_approval_date" class="form-control datepicker" value="{{ radius_approval_date }}">
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Sessions Approval Date</label>
+                        <input type="date" name="sessions_approval_date" class="form-control datepicker" value="{{ sessions_approval_date }}">
+                    </div>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="form-group mt-3">
+                    <label class="form-label">Approval Comments</label>
+                    <textarea name="approval_comments" class="form-control" rows="2">{{ approval_comments|default:'' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Ticket Information -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-ticket-alt"></i> Ticket Information</h3>
+            </div>
+            <div class="form-body">
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Ticket #</label>
+                        <input type="text" name="ticket_number" class="form-control" value="{{ ticket_number|default:'' }}">
+                        <div class="help-text">Leave blank for auto-generation</div>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Ticket Open Date</label>
+                        <input type="datetime-local" name="ticket_open_date" class="form-control" value="{{ ticket_open_date|default:'' }}">
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Ticket Completed Date</label>
+                        <input type="datetime-local" name="ticket_completed_date" class="form-control" value="{{ ticket_completed_date|default:'' }}">
+                    </div>
+                </div>
+                <div class="form-group mt-2">
+                    <label class="form-label">Ticket Notes</label>
+                    <textarea name="ticket_notes" class="form-control" rows="2">{{ ticket_notes|default:'' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Client Approval (FACS Only) -->
+        {% if letter.system_type == 'FACS' %}
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-users"></i> Client Approval</h3>
+                <p class="text-muted small mb-0">Select clients that need to approve this letter</p>
+            </div>
+            <div class="form-body">
+                <div class="client-grid-three">
+                    <!-- US Bank -->
+                    <div class="client-card">
+                        <div class="client-header">
+                            <input type="checkbox" class="client-checkbox" data-client="us_bank"
+                                   name="client_us_bank" id="client_us_bank"
+                                   {% if client_approvals and 'US_Bank' in client_approvals %}checked{% endif %}>
+                            <label for="client_us_bank"><strong>US Bank</strong></label>
+                        </div>
+                        {% if client_approvals and 'US_Bank' in client_approvals %}
+                        <div class="mt-2 small">
+                            <span class="badge {% if client_approvals.US_Bank.status == 'Approved' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                <i class="fas {% if client_approvals.US_Bank.status == 'Approved' %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                                {{ client_approvals.US_Bank.status|default:'Pending' }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- US Bank Retail -->
+                    <div class="client-card">
+                        <div class="client-header">
+                            <input type="checkbox" class="client-checkbox" data-client="us_bank_retail"
+                                   name="client_us_bank_retail" id="client_us_bank_retail"
+                                   {% if client_approvals and 'US_Bank_Retail' in client_approvals %}checked{% endif %}>
+                            <label for="client_us_bank_retail"><strong>US Bank Retail</strong></label>
+                        </div>
+                        {% if client_approvals and 'US_Bank_Retail' in client_approvals %}
+                        <div class="mt-2 small">
+                            <span class="badge {% if client_approvals.US_Bank_Retail.status == 'Approved' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                <i class="fas {% if client_approvals.US_Bank_Retail.status == 'Approved' %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                                {{ client_approvals.US_Bank_Retail.status|default:'Pending' }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Discover -->
+                    <div class="client-card">
+                        <div class="client-header">
+                            <input type="checkbox" class="client-checkbox" data-client="discover"
+                                   name="client_discover" id="client_discover"
+                                   {% if client_approvals and 'Discover' in client_approvals %}checked{% endif %}>
+                            <label for="client_discover"><strong>Discover</strong></label>
+                        </div>
+                        {% if client_approvals and 'Discover' in client_approvals %}
+                        <div class="mt-2 small">
+                            <span class="badge {% if client_approvals.Discover.status == 'Approved' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                <i class="fas {% if client_approvals.Discover.status == 'Approved' %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                                {{ client_approvals.Discover.status|default:'Pending' }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Wells Fargo -->
+                    <div class="client-card">
+                        <div class="client-header">
+                            <input type="checkbox" class="client-checkbox" data-client="wells_fargo"
+                                   name="client_wells_fargo" id="client_wells_fargo"
+                                   {% if client_approvals and 'Wells_Fargo' in client_approvals %}checked{% endif %}>
+                            <label for="client_wells_fargo"><strong>Wells Fargo</strong></label>
+                        </div>
+                        {% if client_approvals and 'Wells_Fargo' in client_approvals %}
+                        <div class="mt-2 small">
+                            <span class="badge {% if client_approvals.Wells_Fargo.status == 'Approved' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                <i class="fas {% if client_approvals.Wells_Fargo.status == 'Approved' %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                                {{ client_approvals.Wells_Fargo.status|default:'Pending' }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Capital One -->
+                    <div class="client-card">
+                        <div class="client-header">
+                            <input type="checkbox" class="client-checkbox" data-client="capital_one"
+                                   name="client_capital_one" id="client_capital_one"
+                                   {% if client_approvals and 'Capital_One' in client_approvals %}checked{% endif %}>
+                            <label for="client_capital_one"><strong>Capital One</strong></label>
+                        </div>
+                        {% if client_approvals and 'Capital_One' in client_approvals %}
+                        <div class="mt-2 small">
+                            <span class="badge {% if client_approvals.Capital_One.status == 'Approved' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                <i class="fas {% if client_approvals.Capital_One.status == 'Approved' %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                                {{ client_approvals.Capital_One.status|default:'Pending' }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="help-text mt-3 text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Check/uncheck clients as needed. The status badge shows the current approval state for selected clients.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <!-- DEBUG: Remove after testing -->
+        <div style="display: none;" id="debug-info">
+            <pre>client_approvals: {{ client_approvals|safe }}</pre>
+            <pre>letter.client_approvals: {{ letter.client_approvals|safe }}</pre>
+        </div>
+        <!-- Section 5: Version Control -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-code-branch"></i> Version Control</h3>
+            </div>
+            <div class="form-body">
+                <div class="version-list">
+                    {% if versions %}
+                        {% for version in versions %}
+                        <div class="version-item">
+                            <div class="version-info">
+                                <span class="version-badge">{{ version.version_number }}</span>
+                                <span>{{ version.version_date|date:"M d, Y H:i" }}</span>
+                                <span>by {{ version.version_author.get_full_name|default:version.version_author.username }}</span>
+                                {% if version.version_note %}
+                                <span class="text-muted">{{ version.version_note|truncatechars:50 }}</span>
+                                {% endif %}
+                            </div>
+                            {% if version.pdf_copy %}
+                            <a href="{{ version.pdf_copy.url }}" class="btn-doc btn-download" target="_blank">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-history fa-2x mb-2"></i>
+                            <p>No prior versions available</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: File Upload -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-upload"></i> File Upload</h3>
+            </div>
+            <div class="form-body">
+                {% if documents %}
+                <div class="document-list mb-4">
+                    <label class="form-label">Existing Documents ({{ documents|length }})</label>
+                    {% for doc in documents %}
+                    <div class="document-item" id="doc-item-{{ doc.id }}">
+                        <div class="document-info" style="flex: 1;">
+                            <div class="document-icon">
+                                <i class="fas fa-file-{{ doc.file_type }}"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div class="document-name">{{ doc.file_name }}</div>
+                                <div class="document-meta">
+                                    <span class="badge bg-secondary me-2">{{ doc.get_document_type_display|default:"Original" }}</span>
+                                    {{ doc.upload_date|date:"M d, Y H:i" }} •
+                                    {{ doc.file_size|filesizeformat }}
+                                </div>
+                                {% if doc.description %}
+                                <div class="document-description small text-muted mt-1">
+                                    <i class="fas fa-align-left"></i> {{ doc.description|truncatechars:100 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="document-actions">
+                            <button type="button" class="btn-doc btn-edit" onclick="editDocument({{ doc.id }}, '{{ doc.document_type|default:"Original" }}', `{{ doc.description|escapejs }}`)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <a href="{% url 'letters:download_document' doc.id %}" class="btn-doc btn-download" target="_blank">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <button type="button" class="btn-doc btn-delete" onclick="deleteDocument({{ doc.id }})">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- New Upload Section -->
+                <div class="new-upload-section">
+                    <label class="form-label">Upload New Document</label>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Click to upload</strong> or drag and drop</p>
+                        <small class="text-muted">PDF, DOC, DOCX (Max 10MB)</small>
+                    </div>
+                    <input type="file" name="document" id="fileInput" style="display: none;" accept=".pdf,.doc,.docx">
+
+                    <!-- Document Details Form - Shows after file selection -->
+                    <div id="documentDetails" style="display: none;">
+                        <div class="upload-info-alert">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Selected file:</strong> <span id="selectedFileName"></span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label">Document Type</label>
+                                    <select name="document_type" id="document_type" class="form-select">
+                                        <option value="">Select document type</option>
+                                        <option value="Original">Original Document</option>
+                                        <option value="Revision">Revision Document</option>
+                                        <option value="Supporting">Supporting Document</option>
+                                        <option value="Client Response">Client Response</option>
+                                        <option value="Approval Proof">Approval Proof</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="document_description" id="document_description" class="form-control" rows="2" placeholder="Optional description of the document..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" class="cancel-upload-btn" onclick="cancelUpload()">
+                                <i class="fas fa-times me-1"></i> Cancel Upload
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex gap-3 justify-content-end mt-4">
+            <!-- Cancel Button - Goes to List -->
+            <a href="{% url 'letters:list' %}" class="btn-cancel">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+
+            <!-- Save as Draft Button -->
+            <button type="submit" name="action" value="draft" class="btn-draft" id="draftBtn">
+                <i class="fas fa-save me-2"></i>Save as Draft
+            </button>
+
+            <!-- Submit for Review Button (only for Draft status) -->
+            {% if letter.status == 'Draft' %}
+            <button type="submit" name="action" value="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-paper-plane me-2"></i>Submit for Review
+            </button>
+            {% else %}
+            <!-- Update Button (for non-Draft status) -->
+            <button type="submit" name="action" value="update" class="btn-update" id="updateBtn">
+                <i class="fas fa-save me-2"></i>Update Letter
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Edit Document Modal -->
+<div class="modal fade" id="editDocumentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Document Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit_doc_id">
+                <div class="mb-3">
+                    <label class="form-label">Document Type</label>
+                    <select id="edit_doc_type" class="form-select">
+                        <option value="Original">Original Document</option>
+                        <option value="Revision">Revision Document</option>
+                        <option value="Supporting">Supporting Document</option>
+                        <option value="Client Response">Client Response</option>
+                        <option value="Approval Proof">Approval Proof</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea id="edit_doc_description" class="form-control" rows="3" placeholder="Document description..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveDocumentEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+// Initialize date pickers
+flatpickr(".datepicker", {
+    dateFormat: "Y-m-d",
+    allowInput: true
+});
+
+// File upload handling with document details
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+const documentDetails = document.getElementById('documentDetails');
+const selectedFileNameSpan = document.getElementById('selectedFileName');
+let selectedFile = null;
+
+if (uploadArea && fileInput) {
+    uploadArea.onclick = function() { fileInput.click(); };
+
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderColor = 'var(--primary-color)';
+        this.style.background = 'rgba(102, 126, 234, 0.05)';
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.style.borderColor = 'var(--gray-light)';
+        this.style.background = 'transparent';
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderColor = 'var(--gray-light)';
+        this.style.background = 'transparent';
+
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect(e.dataTransfer.files[0]);
+        }
+    });
+
+    fileInput.onchange = function() {
+        if (this.files && this.files.length > 0) {
+            handleFileSelect(this.files[0]);
+        }
+    };
+}
+
+function handleFileSelect(file) {
+    selectedFile = file;
+
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(file.type)) {
+        Swal.fire('Error', 'Please upload PDF, DOC, or DOCX files only.', 'error');
+        fileInput.value = '';
+        return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+        Swal.fire('Error', 'File size must be less than 10MB.', 'error');
+        fileInput.value = '';
+        return;
+    }
+
+    selectedFileNameSpan.textContent = file.name;
+    documentDetails.style.display = 'block';
+    documentDetails.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function cancelUpload() {
+    selectedFile = null;
+    fileInput.value = '';
+    documentDetails.style.display = 'none';
+    document.getElementById('document_type').value = '';
+    document.getElementById('document_description').value = '';
+}
+
+function editDocument(docId, currentType, currentDescription) {
+    document.getElementById('edit_doc_id').value = docId;
+    document.getElementById('edit_doc_type').value = currentType;
+    document.getElementById('edit_doc_description').value = currentDescription || '';
+
+    const modal = new bootstrap.Modal(document.getElementById('editDocumentModal'));
+    modal.show();
+}
+
+function saveDocumentEdit() {
+    const docId = document.getElementById('edit_doc_id').value;
+    const docType = document.getElementById('edit_doc_type').value;
+    const description = document.getElementById('edit_doc_description').value;
+
+    fetch(`/letters/documents/${docId}/update/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            document_type: docType,
+            description: description
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Success', 'Document updated successfully!', 'success')
+                .then(() => location.reload());
+        } else {
+            Swal.fire('Error', data.error || 'Failed to update document', 'error');
+        }
+    })
+    .catch(error => {
+        Swal.fire('Error', 'Failed to update document', 'error');
+    });
+}
+
+function deleteDocument(docId) {
+    Swal.fire({
+        title: 'Delete Document?',
+        text: 'This action cannot be undone!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/letters/documents/${docId}/delete/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value }
+            }).then(response => {
+                if (response.ok) {
+                    Swal.fire('Deleted!', 'Document has been deleted.', 'success')
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire('Error', 'Failed to delete document', 'error');
+                }
+            });
+        }
+    });
+}
+
+// Form validation - only validate when document details are visible
+document.getElementById('editForm').addEventListener('submit', function(e) {
+    console.log("Form submission triggered");
+
+    if (selectedFile && documentDetails.style.display === 'block') {
+        if (!document.getElementById('document_type').value) {
+            e.preventDefault();
+            Swal.fire('Error', 'Please select a document type for the uploaded file.', 'error');
+            return false;
+        }
+    }
+
+    console.log("Form submission allowed");
+    return true;
+});
+
+// Debug button clicks
+document.getElementById('draftBtn')?.addEventListener('click', function() {
+    console.log("Save as Draft button clicked");
+});
+
+document.getElementById('submitBtn')?.addEventListener('click', function() {
+    console.log("Submit for Review button clicked");
+});
+
+document.getElementById('updateBtn')?.addEventListener('click', function() {
+    console.log("Update button clicked");
+});
+</script>
+{% endblock %}

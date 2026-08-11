@@ -1,0 +1,125 @@
+/* static/css/theme.css - Color Theme System */
+
+/* ==================== COLOR THEMES ==================== */
+/* Default Theme (Purple/Pink) */
+:root {
+    /* Primary Colors - Main Brand Color */
+    --primary-start: #667eea;      /* Starting color of gradient */
+    --primary-middle: #764ba2;     /* Middle color of gradient */
+    --primary-end: #f093fb;        /* Ending color of gradient */
+    --primary-solid: #667eea;      /* Solid color for buttons etc */
+
+    /* Secondary Colors */
+    --secondary-color: #3f37c9;
+    --accent-color: #ff6b6b;
+    --accent-light: #ff8787;
+
+    /* Status Colors */
+    --success-color: #4caf50;
+    --danger-color: #f44336;
+    --warning-color: #ff9800;
+    --info-color: #00bcd4;
+
+    /* Sidebar Colors */
+    --sidebar-start: #667eea;
+    --sidebar-middle: #764ba2;
+    --sidebar-end: #f093fb;
+
+    /* Text Colors */
+    --text-dark: #1e293b;
+    --text-gray: #64748b;
+    --text-light: #f8fafc;
+
+    /* Background Colors */
+    --bg-light: #f8fafc;
+    --bg-gray: #f1f5f9;
+    --bg-dark: #0f172a;
+}
+
+/* Theme 1: Blue Ocean Theme */
+.theme-blue-ocean {
+    --primary-start: #1e3c72;
+    --primary-middle: #2a5298;
+    --primary-end: #3b82f6;
+    --primary-solid: #2a5298;
+    --sidebar-start: #1e3c72;
+    --sidebar-middle: #2a5298;
+    --sidebar-end: #3b82f6;
+}
+
+/* Theme 2: Green Forest Theme */
+.theme-green-forest {
+    --primary-start: #134e5e;
+    --primary-middle: #2b7a62;
+    --primary-end: #4caf50;
+    --primary-solid: #2b7a62;
+    --sidebar-start: #134e5e;
+    --sidebar-middle: #2b7a62;
+    --sidebar-end: #4caf50;
+}
+
+/* Theme 3: Sunset Orange Theme */
+.theme-sunset-orange {
+    --primary-start: #ff6a00;
+    --primary-middle: #ee0979;
+    --primary-end: #ff4d4d;
+    --primary-solid: #ff6a00;
+    --sidebar-start: #ff6a00;
+    --sidebar-middle: #ee0979;
+    --sidebar-end: #ff4d4d;
+}
+
+/* Theme 4: Midnight Blue Theme */
+.theme-midnight-blue {
+    --primary-start: #0f2027;
+    --primary-middle: #203a43;
+    --primary-end: #2c5364;
+    --primary-solid: #203a43;
+    --sidebar-start: #0f2027;
+    --sidebar-middle: #203a43;
+    --sidebar-end: #2c5364;
+}
+
+/* Theme 5: Pink Passion Theme */
+.theme-pink-passion {
+    --primary-start: #ff0844;
+    --primary-middle: #ffb199;
+    --primary-end: #ff6a88;
+    --primary-solid: #ff0844;
+    --sidebar-start: #ff0844;
+    --sidebar-middle: #ffb199;
+    --sidebar-end: #ff6a88;
+}
+
+/* Theme 6: Purple Dream Theme */
+.theme-purple-dream {
+    --primary-start: #8e2de2;
+    --primary-middle: #4a00e0;
+    --primary-end: #b721ff;
+    --primary-solid: #8e2de2;
+    --sidebar-start: #8e2de2;
+    --sidebar-middle: #4a00e0;
+    --sidebar-end: #b721ff;
+}
+
+/* Theme 7: Teal Wave Theme */
+.theme-teal-wave {
+    --primary-start: #11998e;
+    --primary-middle: #38ef7d;
+    --primary-end: #2ecc71;
+    --primary-solid: #11998e;
+    --sidebar-start: #11998e;
+    --sidebar-middle: #38ef7d;
+    --sidebar-end: #2ecc71;
+}
+
+/* Theme 8: Royal Gold Theme */
+.theme-royal-gold {
+    --primary-start: #c31432;
+    --primary-middle: #ff6a00;
+    --primary-end: #ffb347;
+    --primary-solid: #c31432;
+    --sidebar-start: #c31432;
+    --sidebar-middle: #ff6a00;
+    --sidebar-end: #ffb347;
+}

@@ -1,0 +1,56 @@
+<footer class="bg-white mt-4 py-4 text-center text-muted border-top">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-md-start mb-3 mb-md-0">
+                <small>© {% now "Y" %} Radius Global Solutions. All rights reserved.</small>
+                <br>
+                <small class="text-muted">Secure Enterprise Solution</small>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="d-flex justify-content-md-end justify-content-center gap-3">
+                    <small>
+                        <i class="fas fa-code-branch me-1"></i>Version 1.0
+                    </small>
+                   <!-- <small>
+                        <a href="{% url 'accounts:help' %}" class="text-muted text-decoration-none hover-primary">
+                            <i class="fas fa-question-circle me-1"></i>Help
+                        </a>
+                    </small>
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none hover-primary">
+                            <i class="fas fa-shield-alt me-1"></i>Privacy
+                        </a>
+                    </small>
+                    <small>
+                        <a href="#" class="text-muted text-decoration-none hover-primary">
+                            <i class="fas fa-envelope me-1"></i>Support
+                        </a>
+                    </small>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+footer a.hover-primary:hover {
+    color: #4361ee !important;
+    transition: color 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    footer {
+        padding: 1.5rem;
+    }
+
+    footer .col-md-6 {
+        text-align: center !important;
+    }
+
+    footer .d-flex {
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+        gap: 1rem !important;
+    }
+}
+</style>

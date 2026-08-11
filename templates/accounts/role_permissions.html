@@ -1,0 +1,566 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Role Permissions - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.permissions-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.permissions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.role-selector {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.role-btn {
+    padding: 8px 20px;
+    border-radius: 30px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.role-btn:hover {
+    border-color: #4361ee;
+    color: #4361ee;
+}
+
+.role-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: transparent;
+    color: white;
+}
+
+.permissions-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.permissions-header-card {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.permissions-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.permissions-title i {
+    color: #4361ee;
+    font-size: 20px;
+}
+
+.permissions-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.permission-group {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.permission-group:last-child {
+    border-bottom: none;
+}
+
+.permission-group-header {
+    padding: 15px 25px;
+    background: #f8fafc;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.permission-group-header:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.permission-group-title {
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.permission-group-title i {
+    color: #4361ee;
+    font-size: 18px;
+}
+
+.permission-group-title .badge {
+    background: #4361ee;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    margin-left: 10px;
+}
+
+.permission-group-toggle {
+    color: #64748b;
+    transition: transform 0.3s ease;
+}
+
+.permission-group-content {
+    padding: 0 25px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.permission-group-content.expanded {
+    max-height: 2000px;
+    padding: 20px 25px;
+}
+
+.permission-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+}
+
+.permission-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.permission-item:hover {
+    background: #f8fafc;
+}
+
+.permission-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #4361ee;
+}
+
+.permission-label {
+    flex: 1;
+    cursor: pointer;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.permission-label small {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.save-permissions {
+    position: sticky;
+    bottom: 20px;
+    right: 20px;
+    text-align: right;
+    margin-top: 20px;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 28px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    cursor: pointer;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-reset {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 28px;
+    color: #64748b;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-reset:hover {
+    border-color: #ff9800;
+    color: #ff9800;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.toast-message {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+}
+
+.toast-message.show {
+    transform: translateX(0);
+}
+
+.toast-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.toast-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+</style>
+{% endblock %}
+
+{% block page_title %}Role Permissions{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'accounts:user_management' %}">User Management</a></li>
+<li class="breadcrumb-item active">Role Permissions</li>
+{% endblock %}
+
+{% block content %}
+<div class="permissions-container">
+    <div class="permissions-header">
+        <h3><i class="fas fa-lock me-2"></i>Role-Based Permissions</h3>
+        <div class="role-selector" id="roleSelector">
+            {% for role in roles %}
+            <button class="role-btn {% if forloop.first %}active{% endif %}" data-role-id="{{ role.id }}" data-role-name="{{ role.display_name }}">
+                <i class="fas fa-{% if role.name == 'CCO' %}crown{% elif role.name == 'Representative' %}user-tie{% elif role.name == 'InternalReviewer' %}check-double{% elif role.name == 'ClientManager' %}building{% else %}eye{% endif %} me-1"></i>
+                {{ role.display_name }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="permissions-card">
+        <div class="permissions-header-card">
+            <div class="permissions-title">
+                <i class="fas fa-key"></i>
+                <span id="selectedRoleName">{{ roles.0.display_name }}</span>
+                <span class="badge bg-primary">Permissions</span>
+            </div>
+            <div class="permissions-actions">
+                <button class="btn-reset" id="resetPermissions">
+                    <i class="fas fa-undo me-2"></i>Reset to Default
+                </button>
+            </div>
+        </div>
+
+        <form id="permissionsForm">
+            {% csrf_token %}
+            <input type="hidden" name="role_id" id="roleId" value="{{ roles.0.id }}">
+
+            {% for app_label, perms in permissions_by_app.items %}
+            <div class="permission-group">
+                <div class="permission-group-header" onclick="toggleGroup(this)">
+                    <div class="permission-group-title">
+                        <i class="fas fa-{% if app_label == 'accounts' %}users{% elif app_label == 'letters' %}envelope{% else %}cog{% endif %}"></i>
+                        {{ app_label|title }}
+                        <span class="badge">{{ perms|length }}</span>
+                    </div>
+                    <div class="permission-group-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="permission-group-content">
+                    <div class="permission-grid">
+                        {% for perm in perms %}
+                        <div class="permission-item">
+                            <input type="checkbox"
+                                   name="permissions"
+                                   value="{{ perm.id }}"
+                                   id="perm_{{ perm.id }}"
+                                   class="permission-checkbox"
+                                   data-perm-codename="{{ perm.codename }}">
+                            <label for="perm_{{ perm.id }}" class="permission-label">
+                                {{ perm.name }}
+                                <small>{{ perm.content_type.app_label }}.{{ perm.codename }}</small>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </form>
+    </div>
+
+    <div class="save-permissions">
+        <button class="btn-save" id="savePermissions">
+            <i class="fas fa-save me-2"></i>Save Permissions
+        </button>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+<script>
+let currentRoleId = {{ roles.0.id }};
+
+// Toggle permission group expansion
+function toggleGroup(header) {
+    const content = header.nextElementSibling;
+    const toggleIcon = header.querySelector('.permission-group-toggle i');
+
+    content.classList.toggle('expanded');
+    if (content.classList.contains('expanded')) {
+        toggleIcon.classList.remove('fa-chevron-down');
+        toggleIcon.classList.add('fa-chevron-up');
+    } else {
+        toggleIcon.classList.remove('fa-chevron-up');
+        toggleIcon.classList.add('fa-chevron-down');
+    }
+}
+
+// Expand all groups by default
+document.querySelectorAll('.permission-group-content').forEach(content => {
+    content.classList.add('expanded');
+});
+
+// Role selector
+document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Update active state
+        document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        // Update current role
+        currentRoleId = this.dataset.roleId;
+        document.getElementById('roleId').value = currentRoleId;
+        document.getElementById('selectedRoleName').innerText = this.dataset.roleName;
+
+        // Load permissions for this role
+        loadPermissions(currentRoleId);
+    });
+});
+
+// Load permissions for a role
+function loadPermissions(roleId) {
+    showLoading();
+
+    fetch(`/accounts/roles/${roleId}/permissions/load/`, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reset all checkboxes
+            document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Check the permissions that belong to this role
+            data.permissions.forEach(permId => {
+                const checkbox = document.querySelector(`input[value="${permId}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+
+            showToast('Permissions loaded successfully', 'success');
+        } else {
+            showToast(data.error || 'Failed to load permissions', 'error');
+        }
+        hideLoading();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error loading permissions', 'error');
+        hideLoading();
+    });
+}
+
+// Save permissions
+document.getElementById('savePermissions').addEventListener('click', function() {
+    const selectedPermissions = [];
+    document.querySelectorAll('.permission-checkbox:checked').forEach(checkbox => {
+        selectedPermissions.push(checkbox.value);
+    });
+
+    const data = {
+        role_id: currentRoleId,
+        permissions: selectedPermissions
+    };
+
+    showLoading();
+
+    fetch('/accounts/roles/permissions/save/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Permissions saved successfully!', 'success');
+        } else {
+            showToast(data.error || 'Failed to save permissions', 'error');
+        }
+        hideLoading();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error saving permissions', 'error');
+        hideLoading();
+    });
+});
+
+// Reset permissions to default
+document.getElementById('resetPermissions').addEventListener('click', function() {
+    if (confirm('Are you sure you want to reset permissions to default for this role?')) {
+        showLoading();
+
+        fetch(`/accounts/roles/${currentRoleId}/permissions/reset/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload permissions
+                loadPermissions(currentRoleId);
+                showToast('Permissions reset to default', 'success');
+            } else {
+                showToast(data.error || 'Failed to reset permissions', 'error');
+            }
+            hideLoading();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error resetting permissions', 'error');
+            hideLoading();
+        });
+    }
+});
+
+// Helper functions
+function showLoading() {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast-message toast-${type}`;
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,391 @@
+<nav class="top-navbar">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <button class="btn btn-link d-md-none" id="sidebarToggle">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <!-- Notifications Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-link position-relative" data-bs-toggle="dropdown">
+                    <i class="fas fa-bell fa-lg"></i>
+                    {% if notification_count %}
+                    <span class="notification-badge">
+                        {{ notification_count }}
+                    </span>
+                    {% endif %}
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <div class="dropdown-header d-flex justify-content-between align-items-center">
+                        <strong><i class="fas fa-bell me-2"></i>Notifications</strong>
+                        <a href="{% url 'accounts:notifications' %}" class="text-white text-decoration-none small">View all</a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    {% for notification in notifications|slice:":5" %}
+                    <a class="dropdown-item notification-item" href="{{ notification.link }}">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-{% if notification.type == 'approval_needed' %}clock text-warning{% elif notification.type == 'approval_completed' %}check-circle text-success{% elif notification.type == 'revision_needed' %}edit text-danger{% else %}info-circle text-info{% endif %} mt-1"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="small fw-bold">{{ notification.title }}</div>
+                                <div class="small text-muted">{{ notification.message|truncatechars:50 }}</div>
+                                <div class="small text-muted mt-1">
+                                    <i class="far fa-clock me-1"></i>{{ notification.created_at|timesince }} ago
+                                </div>
+                            </div>
+                            {% if not notification.is_read %}
+                            <span class="badge bg-primary rounded-pill ms-2">New</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-bell-slash fa-2x text-muted mb-2"></i>
+                        <p class="small text-muted mb-0">No new notifications</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- User Menu -->
+            <div class="dropdown">
+                <button class="btn btn-link d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown">
+                    <div class="user-avatar">
+                        {{ user.get_full_name|make_list|first|default:user.username|make_list|first|upper }}
+                    </div>
+                    <div class="text-start d-none d-sm-block">
+                        <div class="fw-bold text-dark">{{ user.get_full_name|default:user.username }}</div>
+                        <small class="text-muted">{{ user.get_role_display }}</small>
+                    </div>
+                    <i class="fas fa-chevron-down fa-sm text-muted"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                            <i class="fas fa-user me-2"></i>My Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'accounts:change_password' %}">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+
+                    <!-- Theme Switcher Section -->
+                    <li class="dropdown-header">
+                        <i class="fas fa-palette me-2"></i>Theme
+                    </li>
+                    <li>
+                        <a class="dropdown-item theme-option" href="#" onclick="changeTheme('theme-blue-ocean'); return false;">
+                            <i class="fas fa-water me-2"></i>Blue Ocean
+                            <span class="theme-preview" style="background: linear-gradient(135deg, #1e3c72, #2a5298, #3b82f6);"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item theme-option" href="#" onclick="changeTheme('theme-green-forest'); return false;">
+                            <i class="fas fa-tree me-2"></i>Green Forest
+                            <span class="theme-preview" style="background: linear-gradient(135deg, #134e5e, #2b7a62, #4caf50);"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item theme-option" href="#" onclick="changeTheme('theme-sunset-orange'); return false;">
+                            <i class="fas fa-sun me-2"></i>Sunset Orange
+                            <span class="theme-preview" style="background: linear-gradient(135deg, #ff6a00, #ee0979, #ff4d4d);"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item theme-option" href="#" onclick="changeTheme('theme-midnight-blue'); return false;">
+                            <i class="fas fa-moon me-2"></i>Midnight Blue
+                            <span class="theme-preview" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item theme-option" href="#" onclick="changeTheme('theme-pink-passion'); return false;">
+                            <i class="fas fa-heart me-2"></i>Pink Passion
+                            <span class="theme-preview" style="background: linear-gradient(135deg, #ff0844, #ffb199, #ff6a88);"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item theme-option" href="#" onclick="changeTheme('theme-purple-dream'); return false;">
+                            <i class="fas fa-gem me-2"></i>Purple Dream
+                            <span class="theme-preview" style="background: linear-gradient(135deg, #8e2de2, #4a00e0, #b721ff);"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item theme-option" href="#" onclick="changeTheme('theme-teal-wave'); return false;">
+                            <i class="fas fa-waveform me-2"></i>Teal Wave
+                            <span class="theme-preview" style="background: linear-gradient(135deg, #11998e, #38ef7d, #2ecc71);"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item theme-option" href="#" onclick="changeTheme('theme-royal-gold'); return false;">
+                            <i class="fas fa-crown me-2"></i>Royal Gold
+                            <span class="theme-preview" style="background: linear-gradient(135deg, #c31432, #ff6a00, #ffb347);"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item theme-option" href="#" onclick="changeTheme(''); return false;">
+                            <i class="fas fa-undo me-2"></i>Reset to Default
+                            <span class="theme-preview" style="background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);"></span>
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li>
+                        <a class="dropdown-item" href="{% url 'accounts:help' %}">
+                            <i class="fas fa-question-circle me-2"></i>Help & Support
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-danger" style="background: none; border: none; width: 100%; text-align: left;">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<style>
+/* Additional styles for theme switcher */
+.theme-option {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.theme-preview {
+    width: 30px;
+    height: 20px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-left: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-header {
+    background: linear-gradient(135deg, var(--sidebar-start, #667eea), var(--sidebar-middle, #764ba2));
+    color: white;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.theme-option:hover .theme-preview {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* Active theme indicator */
+.theme-option.active-theme {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+    border-left: 3px solid var(--primary-color);
+}
+
+/* Improved user avatar styles */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--sidebar-start, #667eea), var(--sidebar-middle, #764ba2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.user-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Notification badge animation */
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: linear-gradient(135deg, var(--accent-color, #ff6b6b), var(--accent-light, #ff8787));
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 20px;
+    animation: pulse 2s infinite;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .theme-preview {
+        width: 24px;
+        height: 16px;
+    }
+
+    .dropdown-menu {
+        max-width: 320px;
+    }
+}
+</style>
+
+<script>
+// Theme switcher function
+function changeTheme(themeName) {
+    // Remove all theme classes
+    document.body.classList.remove(
+        'theme-blue-ocean',
+        'theme-green-forest',
+        'theme-sunset-orange',
+        'theme-midnight-blue',
+        'theme-pink-passion',
+        'theme-purple-dream',
+        'theme-teal-wave',
+        'theme-royal-gold'
+    );
+
+    // Add new theme class if not reset
+    if (themeName) {
+        document.body.classList.add(themeName);
+        localStorage.setItem('letter_portal_theme', themeName);
+        showThemeNotification(`Theme changed to ${getThemeDisplayName(themeName)}`);
+    } else {
+        localStorage.removeItem('letter_portal_theme');
+        showThemeNotification('Theme reset to default');
+    }
+
+    // Update active theme highlight in dropdown
+    updateActiveThemeHighlight(themeName);
+}
+
+function getThemeDisplayName(themeClass) {
+    const themes = {
+        'theme-blue-ocean': 'Blue Ocean',
+        'theme-green-forest': 'Green Forest',
+        'theme-sunset-orange': 'Sunset Orange',
+        'theme-midnight-blue': 'Midnight Blue',
+        'theme-pink-passion': 'Pink Passion',
+        'theme-purple-dream': 'Purple Dream',
+        'theme-teal-wave': 'Teal Wave',
+        'theme-royal-gold': 'Royal Gold'
+    };
+    return themes[themeClass] || themeClass;
+}
+
+function updateActiveThemeHighlight(activeTheme) {
+    // Remove active class from all theme options
+    document.querySelectorAll('.theme-option').forEach(option => {
+        option.classList.remove('active-theme');
+    });
+
+    // Add active class to selected theme
+    if (activeTheme) {
+        const activeOption = document.querySelector(`.theme-option[onclick*="${activeTheme}"]`);
+        if (activeOption) {
+            activeOption.classList.add('active-theme');
+        }
+    }
+}
+
+function showThemeNotification(message) {
+    // Remove existing notification
+    const existingNotification = document.querySelector('.theme-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+
+    // Create new notification
+    const notification = document.createElement('div');
+    notification.className = 'theme-notification';
+    notification.innerHTML = `
+        <i class="fas fa-palette me-2"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+
+    // Remove after 2 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 2000);
+}
+
+// Load saved theme on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('letter_portal_theme');
+    if (savedTheme) {
+        document.body.classList.add(savedTheme);
+        updateActiveThemeHighlight(savedTheme);
+    } else {
+        updateActiveThemeHighlight('');
+    }
+});
+
+// Add notification styles if not already present
+if (!document.querySelector('#theme-notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'theme-notification-styles';
+    style.textContent = `
+        .theme-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--sidebar-start, #667eea), var(--sidebar-middle, #764ba2));
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .theme-notification.show {
+            transform: translateX(0);
+        }
+        .theme-option.active-theme {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            border-left: 3px solid var(--primary-color, #667eea);
+            position: relative;
+        }
+        .theme-option.active-theme::before {
+            content: '✓';
+            position: absolute;
+            right: 40px;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+    `;
+    document.head.appendChild(style);
+}
+</script>

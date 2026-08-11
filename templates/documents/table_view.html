@@ -1,0 +1,138 @@
+<!-- templates/documents/table_view.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ document.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.table-container {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.table-search {
+    padding: 8px 16px;
+    border: 2px solid var(--gray-light);
+    border-radius: 12px;
+    width: 250px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.data-table th {
+    background: var(--light-color);
+    font-weight: 600;
+}
+
+.data-table tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.export-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-export {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <h4>{{ document.title }}</h4>
+        <div class="d-flex gap-3">
+            <input type="text" id="searchInput" class="table-search" placeholder="Search...">
+            <div class="export-buttons">
+                <button onclick="exportToCSV()" class="btn-export btn-outline-primary">
+                    <i class="fas fa-file-csv"></i> Export CSV
+                </button>
+                <button onclick="window.print()" class="btn-export btn-outline-secondary">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table" id="dataTable">
+            <thead>
+                <tr>
+                    {% for column in table_data.columns %}
+                    <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in table_data.rows %}
+                <tr>
+                    {% for value in row %}
+                    <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const searchText = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#dataTable tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchText) ? '' : 'none';
+    });
+});
+
+// Export to CSV
+function exportToCSV() {
+    const table = document.getElementById('dataTable');
+    const rows = table.querySelectorAll('tr');
+    const csv = [];
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('th, td');
+        const rowData = Array.from(cells).map(cell => cell.textContent);
+        csv.push(rowData.join(','));
+    });
+
+    const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '{{ document.title }}.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

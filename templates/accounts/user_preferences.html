@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Preferences - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.preferences-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.preferences-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+}
+
+.preferences-header {
+    padding: 25px 30px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.preferences-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.preferences-header p {
+    margin: 8px 0 0 0;
+    color: var(--gray-color);
+    font-size: 14px;
+}
+
+.preferences-body {
+    padding: 30px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid var(--gray-light);
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+    background: var(--light-color);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+    background: white;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    color: white;
+    font-weight: 600;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+</style>
+{% endblock %}
+
+{% block page_title %}Preferences{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item">
+    <a href="{% url 'dashboard:index' %}" class="text-decoration-none">
+        <i class="fas fa-home me-1"></i>Dashboard
+    </a>
+</li>
+<li class="breadcrumb-item">
+    <a href="{% url 'accounts:profile' %}" class="text-decoration-none">
+        <i class="fas fa-user me-1"></i>My Profile
+    </a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+    <i class="fas fa-sliders-h me-1"></i>Preferences
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="preferences-container">
+    <div class="preferences-card">
+        <div class="preferences-header">
+            <h3><i class="fas fa-sliders-h"></i> User Preferences</h3>
+            <p>Customize your experience</p>
+        </div>
+        <div class="preferences-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">Items Per Page</label>
+                    <select name="items_per_page" class="form-select">
+                        <option value="10">10 items per page</option>
+                        <option value="25" selected>25 items per page</option>
+                        <option value="50">50 items per page</option>
+                        <option value="100">100 items per page</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Date Format</label>
+                    <select name="date_format" class="form-select">
+                        <option value="Y-m-d">YYYY-MM-DD</option>
+                        <option value="m/d/Y" selected>MM/DD/YYYY</option>
+                        <option value="d/m/Y">DD/MM/YYYY</option>
+                        <option value="M d, Y">MMM DD, YYYY</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Time Zone</label>
+                    <select name="timezone" class="form-select">
+                        <option value="UTC">UTC</option>
+                        <option value="America/New_York">Eastern Time</option>
+                        <option value="America/Chicago">Central Time</option>
+                        <option value="America/Denver">Mountain Time</option>
+                        <option value="America/Los_Angeles">Pacific Time</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Theme</label>
+                    <select name="theme" class="form-select">
+                        <option value="light" selected>Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="auto">System Default</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save me-2"></i>Save Preferences
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

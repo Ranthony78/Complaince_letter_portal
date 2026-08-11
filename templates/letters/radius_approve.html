@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Radius Approval - {{ letter.letter_code }}{% endblock %}
+
+{% block page_title %}Radius Approval Review{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:list' %}">Letters</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:detail' letter.id %}">{{ letter.letter_code }}</a></li>
+<li class="breadcrumb-item active">Radius Approval</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-radar"></i> Radius Approval
+            </div>
+
+            <!-- Letter Summary -->
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-info-circle me-2"></i>
+                Please review the letter details below before making your decision.
+            </div>
+
+            <div class="letter-summary mb-4">
+                <h5 class="mb-3">{{ letter.letter_code }}</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-row">
+                            <span class="info-label">Created By:</span>
+                            <span class="info-value">{{ letter.created_by.get_full_name|default:letter.created_by.username }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Regulatory:</span>
+                            <span class="info-value">{{ letter.regulatory|default:"No" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Timing:</span>
+                            <span class="info-value">{{ letter.get_timing_display|default:"-" }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-row">
+                            <span class="info-label">Created Date:</span>
+                            <span class="info-value">{{ letter.created_at|date:"M d, Y H:i"|default:"-" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Production Date:</span>
+                            <span class="info-value">{{ letter.production_date|date:"M d, Y"|default:"-" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Source:</span>
+                            <span class="info-value">{{ letter.source|default:"-" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <strong>Description:</strong>
+                    <p class="mt-1">{{ letter.document_description|default:letter.letter_description|default:"No description provided." }}</p>
+                </div>
+            </div>
+
+            <!-- Approval Form -->
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group mb-4">
+                    <label class="form-label">Comments (Optional)</label>
+                    <textarea name="comments" class="form-control" rows="4" placeholder="Enter any comments or notes about this approval..."></textarea>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button type="submit" name="action" value="approve" class="btn btn-success flex-grow-1">
+                        <i class="fas fa-check-circle me-2"></i>Approve
+                    </button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger flex-grow-1">
+                        <i class="fas fa-times-circle me-2"></i>Reject
+                    </button>
+                    <a href="{% url 'letters:pending_approvals' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.info-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.info-title {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.letter-summary {
+    background: var(--light-color);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.letter-summary h5 {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 500;
+    color: var(--gray-color);
+}
+
+.info-value {
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    border-radius: 12px;
+    border: 2px solid var(--gray-light);
+    padding: 10px 15px;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border: none;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-outline-secondary:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

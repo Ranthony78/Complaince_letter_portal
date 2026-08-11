@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CCO Approval Management - {{ letter.letter_code }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+.approval-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.approval-header {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.approval-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.approval-header h4 i {
+    color: var(--primary-color);
+    font-size: 20px;
+}
+
+.approval-body {
+    padding: 25px;
+}
+
+.approval-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-approved {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-not-started {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.approval-date-display {
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.datepicker-enabled {
+    background-color: white;
+}
+
+.datepicker-disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.approval-note {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.session-reference {
+    font-family: monospace;
+    background: var(--light-color);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+</style>
+{% endblock %}
+
+{% block page_title %}CCO Approval Management{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:list' %}">Letters</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:detail' letter.id %}">{{ letter.letter_code }}</a></li>
+<li class="breadcrumb-item active">Approval Management</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <!-- Letter Summary Card -->
+        <div class="approval-card">
+            <div class="approval-header">
+                <h4><i class="fas fa-file-alt"></i> Letter Summary</h4>
+            </div>
+            <div class="approval-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-row mb-2">
+                            <span class="text-muted">Letter Code:</span>
+                            <strong>{{ letter.letter_code }}</strong>
+                        </div>
+                        <div class="info-row mb-2">
+                            <span class="text-muted">System Type:</span>
+                            <strong>{{ letter.system_type }}</strong>
+                        </div>
+                        <div class="info-row mb-2">
+                            <span class="text-muted">Created By:</span>
+                            <strong>{{ letter.created_by.get_full_name|default:letter.created_by.username }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-row mb-2">
+                            <span class="text-muted">Created Date:</span>
+                            <strong>{{ letter.created_at|date:"M d, Y H:i" }}</strong>
+                        </div>
+                        <div class="info-row mb-2">
+                            <span class="text-muted">Current Status:</span>
+                            <span class="status-indicator status-{{ letter.status|lower }}">
+                                {{ letter.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="info-row mb-2">
+                            <span class="text-muted">Current Version:</span>
+                            <strong>{{ letter.current_version }}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted">Description:</span>
+                    <p class="mt-1">{{ letter.document_description|truncatechars:200 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Radius Approval Card -->
+        <div class="approval-card">
+            <div class="approval-header">
+                <h4><i class="fas fa-radar"></i> Radius Approval</h4>
+            </div>
+            <div class="approval-body">
+                <form method="post" action="{% url 'letters:update_radius_approval' letter.id %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Approver</label>
+                            <select name="cco_representative" class="form-select select2">
+                                <option value="">Select CCO or Representative</option>
+                                {% for user in cco_users %}
+                                <option value="{{ user.id }}" {% if radius_approval and radius_approval.cco_or_representative.id == user.id %}selected{% endif %}>
+                                    {{ user.get_full_name|default:user.username }}
+                                    {% if user.role == 'CCO' %} (CCO){% elif user.role == 'Representative' %} (Representative){% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="help-text">Select who approved this letter</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Approval Date</label>
+                            <input type="date" name="radius_approval_date" 
+                                   class="form-control datepicker" 
+                                   value="{{ radius_approval.approval_date|date:'Y-m-d'|default:'' }}">
+                            <div class="help-text">Select the date when Radius approval was given</div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Comments</label>
+                            <textarea name="radius_comments" class="form-control" rows="2" 
+                                      placeholder="Add any notes about the Radius approval">{{ radius_approval.comments|default:'' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Update Radius Approval
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Current Status Display -->
+                <div class="mt-3 pt-3 border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Current Status:</span>
+                        <span class="approval-status-badge {% if radius_approval.approval_status == 'Approved' %}status-approved{% elif radius_approval.approval_status == 'Pending' %}status-pending{% else %}status-not-started{% endif %}">
+                            <i class="fas fa-{% if radius_approval.approval_status == 'Approved' %}check-circle{% elif radius_approval.approval_status == 'Pending' %}clock{% else %}circle{% endif %} me-1"></i>
+                            {{ radius_approval.approval_status|default:"Not Started" }}
+                        </span>
+                        {% if radius_approval.approval_date %}
+                        <span class="approval-date-display">
+                            <i class="fas fa-calendar-check text-success me-1"></i>
+                            {{ radius_approval.approval_date|date:"M d, Y" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sessions Approval Card -->
+        <div class="approval-card">
+            <div class="approval-header">
+                <h4><i class="fas fa-calendar-check"></i> Sessions Approval</h4>
+            </div>
+            <div class="approval-body">
+                <form method="post" action="{% url 'letters:update_sessions_approval' letter.id %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Session Reference</label>
+                            <input type="text" name="session_reference" class="form-control" 
+                                   value="{{ sessions_approval.session_reference|default:'' }}" 
+                                   placeholder="Enter session reference number">
+                            <div class="help-text">Reference number from the session</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Approval Date</label>
+                            <input type="date" name="sessions_approval_date" 
+                                   class="form-control datepicker" 
+                                   value="{{ sessions_approval.approval_date|date:'Y-m-d'|default:'' }}">
+                            <div class="help-text">Select the date when Sessions approval was given</div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Comments</label>
+                            <textarea name="sessions_comments" class="form-control" rows="2" 
+                                      placeholder="Add any notes about the Sessions approval">{{ sessions_approval.comments|default:'' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Update Sessions Approval
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Current Status Display -->
+                <div class="mt-3 pt-3 border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Current Status:</span>
+                        <span class="approval-status-badge {% if sessions_approval.approval_status == 'Approved' %}status-approved{% elif sessions_approval.approval_status == 'Pending' %}status-pending{% else %}status-not-started{% endif %}">
+                            <i class="fas fa-{% if sessions_approval.approval_status == 'Approved' %}check-circle{% elif sessions_approval.approval_status == 'Pending' %}clock{% else %}circle{% endif %} me-1"></i>
+                            {{ sessions_approval.approval_status|default:"Not Started" }}
+                        </span>
+                        {% if sessions_approval.approval_date %}
+                        <span class="approval-date-display">
+                            <i class="fas fa-calendar-check text-success me-1"></i>
+                            {{ sessions_approval.approval_date|date:"M d, Y" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% if sessions_approval.session_reference %}
+                    <div class="mt-2">
+                        <span class="text-muted">Session Reference:</span>
+                        <span class="session-reference ms-2">{{ sessions_approval.session_reference }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Approval Action (if needed) -->
+        {% if radius_approval.approval_status == 'Approved' and sessions_approval.approval_status == 'Approved' %}
+        <div class="approval-card">
+            <div class="approval-header">
+                <h4><i class="fas fa-check-double"></i> Final Approval</h4>
+            </div>
+            <div class="approval-body">
+                <div class="approval-note">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Both Radius and Sessions approvals have been completed. You can now proceed with the final approval.
+                </div>
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'letters:cco_final_approve' letter.id %}" class="btn btn-success">
+                        <i class="fas fa-check-circle me-2"></i>Proceed to Final Approval
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+$(document).ready(function() {
+    // Initialize date pickers
+    flatpickr(".datepicker", {
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        maxDate: "today"
+    });
+    
+    // Initialize Select2 for dropdowns
+    $('.select2').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select user'
+    });
+});
+</script>
+{% endblock %}

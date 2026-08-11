@@ -1,0 +1,78 @@
+Static Files Download Report
+==================================================
+
+
+📁 root/
+  📄 static_files_report.txt (0 bytes)
+
+📁 chartjs/
+  📄 chart.umd.js (204,509 bytes)
+  📄 chart.umd.min.js (204,783 bytes)
+
+📁 css/
+  📄 bootstrap-icons.min.css (85,875 bytes)
+  📄 bootstrap.min.css (232,914 bytes)
+  📄 bootstrap.min.css.map (589,307 bytes)
+  📄 dashboard.css (9,437 bytes)
+  📄 login.css (8,203 bytes)
+  📄 style.css (32,991 bytes)
+  📄 theme.css (3,294 bytes)
+
+📁 datatables/
+
+📁 datatables\css/
+  📄 dataTables.bootstrap5.min.css (11,770 bytes)
+
+📁 datatables\images/
+  📄 sort_asc.png (160 bytes)
+  📄 sort_both.png (201 bytes)
+  📄 sort_desc.png (158 bytes)
+
+📁 datatables\js/
+  📄 dataTables.bootstrap5.min.js (2,360 bytes)
+  📄 jquery.dataTables.min.js (86,839 bytes)
+
+📁 fonts/
+  📄 bootstrap-icons.woff (176,196 bytes)
+  📄 bootstrap-icons.woff2 (130,764 bytes)
+  📄 inter.css (916 bytes)
+  📄 poppins.css (615 bytes)
+
+📁 icons/
+
+📁 icons\fontawesome/
+
+📁 icons\fontawesome\css/
+  📄 all.min.css (89,220 bytes)
+
+📁 icons\fontawesome\webfonts/
+  📄 fa-brands-400.ttf (180,148 bytes)
+  📄 fa-brands-400.woff2 (104,544 bytes)
+  📄 fa-regular-400.ttf (60,380 bytes)
+  📄 fa-regular-400.woff2 (23,900 bytes)
+  📄 fa-solid-900.ttf (303,480 bytes)
+  📄 fa-solid-900.woff2 (126,828 bytes)
+  📄 fa-v4compatibility.woff2 (4,956 bytes)
+
+📁 images/
+
+📁 js/
+  📄 bootstrap.bundle.min.js (80,421 bytes)
+  📄 bootstrap.bundle.min.js.map (328,624 bytes)
+  📄 jquery-3.6.4.min.js (89,795 bytes)
+  📄 jquery.min.js (89,795 bytes)
+  📄 main.js (2,823 bytes)
+  📄 theme.js (2,098 bytes)
+
+📁 select2/
+
+📁 select2\css/
+  📄 select2-bootstrap-5-theme.min.css (31,223 bytes)
+  📄 select2.min.css (16,264 bytes)
+
+📁 select2\js/
+  📄 select2.min.js (73,163 bytes)
+
+📁 vendor/
+
+📁 webfonts/

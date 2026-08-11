@@ -1,0 +1,489 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Drafts - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+.drafts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.draft-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+}
+
+.draft-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.draft-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.draft-code {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.draft-code i {
+    color: var(--primary-color);
+    margin-right: 8px;
+}
+
+.draft-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--gray-color);
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.draft-description {
+    color: var(--gray-color);
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.draft-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.empty-drafts {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.empty-icon i {
+    font-size: 40px;
+    color: var(--primary-color);
+}
+
+.badge-system {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-facs {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.badge-artiva {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.badge-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-draft {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.badge-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-approved {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.btn-sm {
+    padding: 6px 16px;
+    font-size: 13px;
+}
+
+.pagination-container {
+    margin-top: 24px;
+}
+
+.pagination .page-link {
+    border-radius: 10px;
+    margin: 0 4px;
+    color: var(--dark-color);
+    border: 1px solid var(--gray-light);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 576px) {
+    .draft-actions {
+        flex-direction: column;
+    }
+    .draft-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block page_title %}My Drafts{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item">
+    <a href="{% url 'dashboard:index' %}" class="text-decoration-none">
+        <i class="fas fa-home me-1"></i>Dashboard
+    </a>
+</li>
+<li class="breadcrumb-item">
+    <a href="{% url 'letters:list' %}" class="text-decoration-none">
+        <i class="fas fa-envelope me-1"></i>Letters
+    </a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+    <i class="fas fa-pencil-alt me-1"></i>My Drafts
+</li>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'letters:create_facs' %}" class="btn btn-primary me-2">
+    <i class="fas fa-plus-circle me-2"></i>New FACS
+</a>
+<a href="{% url 'letters:create_artiva' %}" class="btn btn-success">
+    <i class="fas fa-plus-circle me-2"></i>New Artiva
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="fade-in-up">
+    {% if drafts %}
+        {% for draft in drafts %}
+        <div class="draft-card">
+            <div class="draft-header">
+                <div class="draft-code">
+                    <i class="fas fa-{% if draft.system_type == 'FACS' %}file-alt{% else %}file-signature{% endif %}"></i>
+                    {{ draft.letter_code }}
+                </div>
+                <div class="draft-badges">
+                    <span class="badge-system {% if draft.system_type == 'FACS' %}badge-facs{% else %}badge-artiva{% endif %}">
+                        {{ draft.system_type }}
+                    </span>
+                    <span class="badge-status badge-draft">
+                        <i class="fas fa-pencil-alt me-1"></i>Draft
+                    </span>
+                </div>
+            </div>
+
+            <div class="draft-meta">
+                <span><i class="far fa-clock me-1"></i>Created: {{ draft.created_at|date:"M d, Y" }}</span>
+                <span><i class="fas fa-sync-alt me-1"></i>Updated: {{ draft.updated_at|timesince }} ago</span>
+                <span><i class="fas fa-tag me-1"></i>{{ draft.get_timing_display|default:"Timing not set" }}</span>
+                <span><i class="fas fa-gavel me-1"></i>Regulatory: {{ draft.regulatory|default:"No" }}</span>
+                <span><i class="fas fa-code-branch me-1"></i>Version: {{ draft.current_version }}</span>
+            </div>
+
+            <div class="draft-description">
+                {{ draft.document_description|default:draft.letter_description|truncatechars:100 }}
+            </div>
+
+            <div class="draft-actions">
+                <!-- Continue Editing Button -->
+                <a href="
+                    {% if draft.system_type == 'FACS' %}
+                        {% url 'letters:edit_facs' draft.id %}
+                    {% else %}
+                        {% url 'letters:edit_artiva' draft.id %}
+                    {% endif %}
+                " class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-edit me-1"></i>Continue Editing
+                </a>
+
+                <!-- Submit for Review Form -->
+                <form method="POST" action="{% url 'letters:submit_for_review' draft.id %}" style="display: inline;" class="submit-form">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-success btn-sm submit-btn" data-letter-code="{{ draft.letter_code }}" data-letter-id="{{ draft.id }}" data-system-type="{{ draft.system_type }}">
+                        <i class="fas fa-paper-plane me-1"></i>Submit for Review
+                    </button>
+                </form>
+
+                <!-- Delete Button -->
+                <button type="button" onclick="deleteDraft({{ draft.id }}, '{{ draft.letter_code }}', '{{ draft.system_type }}')" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-trash-alt me-1"></i>Delete
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="pagination-container mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-drafts">
+            <div class="empty-icon">
+                <i class="fas fa-pencil-alt"></i>
+            </div>
+            <h4>No drafts yet</h4>
+            <p>Start creating a new letter to see your drafts here</p>
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{% url 'letters:create_facs' %}" class="btn btn-primary">
+                    <i class="fas fa-file-alt me-2"></i>Create FACS Letter
+                </a>
+                <a href="{% url 'letters:create_artiva' %}" class="btn btn-success">
+                    <i class="fas fa-file-signature me-2"></i>Create Artiva Letter
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+// Handle submit button clicks
+document.querySelectorAll('.submit-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const letterCode = this.dataset.letterCode;
+        const letterId = this.dataset.letterId;
+        const systemType = this.dataset.systemType;
+        const form = this.closest('form');
+
+        Swal.fire({
+            title: 'Submit for Review?',
+            html: `Are you sure you want to submit "<strong>${letterCode}</strong>" for review?<br><br>The letter will enter the approval workflow.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, submit it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Submitting...',
+                    text: 'Please wait while we submit your letter.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Submit the form
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(new FormData(form))
+                }).then(response => {
+                    if (response.redirected) {
+                        // Follow the redirect
+                        window.location.href = response.url;
+                    } else if (response.ok) {
+                        Swal.fire({
+                            title: 'Submitted!',
+                            text: `${systemType} letter ${letterCode} has been submitted for review.`,
+                            icon: 'success',
+                            confirmButtonColor: '#28a745'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to submit letter. Please try again.',
+                            icon: 'error',
+                            confirmButtonColor: '#dc2626'
+                        });
+                    }
+                }).catch(error => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#dc2626'
+                    });
+                });
+            }
+        });
+    });
+});
+
+function deleteDraft(letterId, letterCode, systemType) {
+    Swal.fire({
+        title: 'Delete Draft?',
+        html: `Are you sure you want to delete draft "<strong>${letterCode}</strong>"?<br><br>This action cannot be undone.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch(`/letters/${letterId}/delete/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: `Draft "${letterCode}" has been deleted.`,
+                        icon: 'success',
+                        confirmButtonColor: '#28a745'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else if (response.status === 404) {
+                    Swal.fire({
+                        title: 'Not Found',
+                        text: 'Draft not found. It may have been already deleted.',
+                        icon: 'error',
+                        confirmButtonColor: '#dc2626'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to delete draft. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#dc2626'
+                    });
+                }
+            }).catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#dc2626'
+                });
+            });
+        }
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

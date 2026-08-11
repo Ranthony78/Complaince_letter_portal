@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Results - Letter Portal{% endblock %}
+
+{% block page_title %}Search Results{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:list' %}">Letters</a></li>
+<li class="breadcrumb-item active">Search</li>
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <div class="search-header mb-4">
+        <form method="get" action="{% url 'letters:search' %}" class="search-form">
+            <div class="input-group input-group-lg">
+                <input type="text" name="q" class="form-control" placeholder="Search letters by code, description, or content..." value="{{ query }}" autofocus>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    {% if query %}
+        <div class="search-results">
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-search"></i> 
+                    Search Results for "{{ query }}"
+                    <span class="result-count">{{ total_results }} results</span>
+                </div>
+                
+                {% if facs_results %}
+                <div class="result-section">
+                    <h5 class="section-title">
+                        <i class="fas fa-file-alt"></i> FACS Letters ({{ facs_results|length }})
+                    </h5>
+                    {% for letter in facs_results %}
+                    <div class="result-item" onclick="window.location.href='{% url 'letters:facs_detail' letter.id %}'">
+                        <div class="result-title">{{ letter.letter_code }}</div>
+                        <div class="result-desc">{{ letter.document_description|truncatechars:150 }}</div>
+                        <div class="result-meta">
+                            <span><i class="fas fa-tag"></i> {{ letter.get_status_display }}</span>
+                            <span><i class="fas fa-calendar"></i> {{ letter.created_at|date:"M d, Y" }}</span>
+                            <span><i class="fas fa-user"></i> {{ letter.created_by.get_full_name|default:letter.created_by.username }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if artiva_results %}
+                <div class="result-section">
+                    <h5 class="section-title">
+                        <i class="fas fa-file-signature"></i> Artiva Letters ({{ artiva_results|length }})
+                    </h5>
+                    {% for letter in artiva_results %}
+                    <div class="result-item" onclick="window.location.href='{% url 'letters:artiva_detail' letter.id %}'">
+                        <div class="result-title">{{ letter.letter_code }}</div>
+                        <div class="result-desc">{{ letter.document_description|truncatechars:150 }}</div>
+                        <div class="result-meta">
+                            <span><i class="fas fa-tag"></i> {{ letter.get_status_display }}</span>
+                            <span><i class="fas fa-calendar"></i> {{ letter.created_at|date:"M d, Y" }}</span>
+                            <span><i class="fas fa-user"></i> {{ letter.created_by.get_full_name|default:letter.created_by.username }}</span>
+                            {% if letter.artiva_reference %}
+                            <span><i class="fas fa-hashtag"></i> Ref: {{ letter.artiva_reference }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if not facs_results and not artiva_results %}
+                <div class="empty-results text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No letters found matching "{{ query }}"</p>
+                    <small class="text-muted">Try different keywords or check your spelling</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.search-header {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.result-count {
+    font-size: 14px;
+    color: var(--gray-color);
+    margin-left: 10px;
+    font-weight: normal;
+}
+
+.result-section {
+    margin-top: 20px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dark-color);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.result-item {
+    background: var(--light-color);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.result-item:hover {
+    transform: translateX(5px);
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.result-title {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.result-desc {
+    font-size: 13px;
+    color: var(--gray-color);
+    margin-bottom: 8px;
+}
+
+.result-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 11px;
+    color: var(--gray-light);
+    flex-wrap: wrap;
+}
+
+.result-meta i {
+    width: 14px;
+    margin-right: 3px;
+}
+
+.empty-results {
+    padding: 60px 20px;
+}
+</style>
+{% endblock %}

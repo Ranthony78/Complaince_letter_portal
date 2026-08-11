@@ -1,0 +1,623 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ letter.letter_code }} - FACS Letter{% endblock %}
+
+{% block extra_css %}
+<style>
+.client-progress {
+    background: var(--light-color);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.progress-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(var(--success-color) {{ approval_percentage }}%, var(--gray-light) 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    position: relative;
+}
+
+.progress-circle::before {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 50%;
+}
+
+.progress-percent {
+    position: relative;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--success-color);
+    z-index: 1;
+}
+
+.client-list {
+    display: grid;
+    gap: 12px;
+}
+
+.client-item {
+    background: var(--light-color);
+    border-radius: 12px;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.client-item:hover {
+    transform: translateX(5px);
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.client-name {
+    font-weight: 500;
+}
+
+.client-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.approval-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.approval-approved {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.approval-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.approval-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.info-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.info-title {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--gray-color);
+    font-size: 13px;
+}
+
+.info-value {
+    font-weight: 500;
+    color: var(--dark-color);
+    text-align: right;
+}
+
+.approval-date {
+    font-size: 11px;
+    color: var(--gray-color);
+    margin-top: 4px;
+}
+
+.btn-action {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--light-color);
+    color: var(--gray-color);
+    transition: all 0.3s ease;
+}
+
+.btn-action:hover {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    color: white;
+    transform: scale(1.05);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-draft {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.status-radius_pending, .status-sessions_pending, .status-client_pending, .status-cco_review {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-completed {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+</style>
+{% endblock %}
+
+{% block page_title %}{{ letter.letter_code }} (FACS){% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <div class="dropdown">
+        <button class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="fas fa-download me-2"></i>Actions
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" onclick="window.print();"><i class="fas fa-print me-2"></i>Print</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>Export PDF</a></li>
+            <li><a class="dropdown-item" href="{% url 'letters:version_history' object.id %}"><i class="fas fa-history me-2"></i>Version History</a></li>
+            {% if letter.status == 'Draft' and letter.created_by == request.user %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-warning" href="{% url 'letters:edit' object.id %}"><i class="fas fa-edit me-2"></i>Edit Letter</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Manage Approvals Button - Only for CCO -->
+    {% if request.user.role == 'CCO' and letter.status != 'Completed' %}
+    <a href="{% url 'letters:cco_approval_management' object.id %}" class="btn btn-outline-primary">
+        <i class="fas fa-check-double me-2"></i>Manage Approvals
+    </a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:list' %}">Letters</a></li>
+<li class="breadcrumb-item active">{{ letter.letter_code }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Client Approval Progress -->
+        <div class="client-progress">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center">
+                    <div class="progress-circle">
+                        <span class="progress-percent">{{ approval_percentage|floatformat:0 }}%</span>
+                    </div>
+                    <div class="mt-2">
+                        <strong>{{ client_approvals|length }} Clients</strong>
+                        <span class="text-muted ms-1">Total</span>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="client-list">
+                        {% for client, data in client_approvals.items %}
+                        <div class="client-item">
+                            <div class="client-name">
+                                {% if client == "Client Approval 6" and data.custom_name %}
+                                    {{ data.custom_name }}
+                                {% else %}
+                                    {{ client }}
+                                {% endif %}
+                            </div>
+                            <div class="client-status">
+                                {% if data.status == 'Approved' %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <span class="text-success">Approved</span>
+                                    <small class="text-muted">{{ data.date|date:"M d"|default:"" }}</small>
+                                {% else %}
+                                    <i class="fas fa-clock text-warning"></i>
+                                    <span class="text-warning">Pending</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Letter Information -->
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-info-circle"></i> Letter Information
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-row">
+                        <span class="info-label">Letter Code</span>
+                        <span class="info-value">{{ letter.letter_code }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Communication Code</span>
+                        <span class="info-value">{{ letter.communication_code|default:"-" }}</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">
+                            <span class="status-badge status-{{ letter.status|lower }}">
+                                {{ letter.get_status_display }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Current Version</span>
+                        <span class="info-value">{{ letter.current_version }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Created By</span>
+                        <span class="info-value">{{ letter.created_by.get_full_name|default:letter.created_by.username }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regulatory Information -->
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-gavel"></i> Regulatory Information
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-row">
+                        <span class="info-label">Regulatory</span>
+                        <span class="info-value">{{ letter.regulatory|default:"No" }}</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-row">
+                        <span class="info-label">Timing</span>
+                        <span class="info-value">{{ letter.get_timing_display|default:"-" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-6">
+                    <div class="info-row">
+                        <span class="info-label">Production Date</span>
+                        <span class="info-value">{{ letter.production_date|date:"M d, Y"|default:"-" }}</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-row">
+                        <span class="info-label">Source</span>
+                        <span class="info-value">{{ letter.source|default:"-" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Description (if exists) -->
+        {% if letter.document_description %}
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-file-alt"></i> Document Description
+            </div>
+            <p>{{ letter.document_description }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Letter Description -->
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-align-left"></i> Letter Description
+            </div>
+            <p>{{ letter.letter_description|default:"No description provided." }}</p>
+        </div>
+
+        <!-- Ticket Information (if exists) -->
+        {% if ticket %}
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-ticket-alt"></i> Ticket Information
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="info-row">
+                        <span class="info-label">Ticket #</span>
+                        <span class="info-value">{{ ticket.ticket_number }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-row">
+                        <span class="info-label">Open Date</span>
+                        <span class="info-value">{{ ticket.open_date|date:"M d, Y H:i"|default:"-" }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">{{ ticket.get_status_display }}</span>
+                    </div>
+                </div>
+            </div>
+            {% if ticket.notes %}
+            <div class="mt-2">
+                <small class="text-muted">Notes:</small>
+                <p class="small mb-0 mt-1">{{ ticket.notes }}</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="info-sidebar">
+            <!-- Approval Dates Section (CCO Only) -->
+            {% if request.user.role == 'CCO' %}
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-calendar-alt"></i> Approval Dates
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Radius Approval Date</span>
+                    <span class="info-value">
+                        {% if radius_approval and radius_approval.approval_date %}
+                            {{ radius_approval.approval_date|date:"M d, Y" }}
+                            {% if radius_approval.cco_or_representative %}
+                            <div class="approval-date">by {{ radius_approval.cco_or_representative.get_full_name|default:radius_approval.cco_or_representative.username }}</div>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Not set</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Sessions Approval Date</span>
+                    <span class="info-value">
+                        {% if sessions_approval and sessions_approval.approval_date %}
+                            {{ sessions_approval.approval_date|date:"M d, Y" }}
+                            {% if sessions_approval.session_reference %}
+                            <div class="approval-date">Ref: {{ sessions_approval.session_reference }}</div>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Not set</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <!-- Safe comments access -->
+                {% if radius_approval and radius_approval.comments or sessions_approval and sessions_approval.comments %}
+                <div class="mt-2 pt-2 border-top">
+                    <small class="text-muted">Comments:</small>
+                    <p class="small mb-0 mt-1">
+                        {% if radius_approval and radius_approval.comments %}
+                            {{ radius_approval.comments }}
+                        {% elif sessions_approval and sessions_approval.comments %}
+                            {{ sessions_approval.comments }}
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Internal Approvals Status -->
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-check-double"></i> Internal Approvals
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Radius Approval</span>
+                    <span class="info-value">
+                        {% if radius_approval %}
+                            {% if radius_approval.approval_status == 'Approved' %}
+                                <span class="approval-badge approval-approved">
+                                    <i class="fas fa-check-circle"></i> Approved
+                                </span>
+                            {% elif radius_approval.approval_status == 'Rejected' %}
+                                <span class="approval-badge approval-rejected">
+                                    <i class="fas fa-times-circle"></i> Rejected
+                                </span>
+                            {% else %}
+                                <span class="approval-badge approval-pending">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span class="approval-badge approval-pending">
+                                <i class="fas fa-clock"></i> Not Started
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Sessions Approval</span>
+                    <span class="info-value">
+                        {% if sessions_approval %}
+                            {% if sessions_approval.approval_status == 'Approved' %}
+                                <span class="approval-badge approval-approved">
+                                    <i class="fas fa-check-circle"></i> Approved
+                                </span>
+                            {% elif sessions_approval.approval_status == 'Rejected' %}
+                                <span class="approval-badge approval-rejected">
+                                    <i class="fas fa-times-circle"></i> Rejected
+                                </span>
+                            {% else %}
+                                <span class="approval-badge approval-pending">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span class="approval-badge approval-pending">
+                                <i class="fas fa-clock"></i> Not Started
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Documents Section -->
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-paperclip"></i> Documents
+                </div>
+                {% if documents %}
+                    {% for doc in documents %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                        <div>
+                            <i class="fas fa-file-{{ doc.file_type }} text-primary me-2"></i>
+                            {{ doc.file_name }}
+                            <div class="small text-muted">{{ doc.get_document_type_display }}</div>
+                        </div>
+                        <a href="{% url 'letters:download_document' doc.id %}" class="btn btn-sm btn-outline-primary" target="_blank">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-file-upload fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">No documents uploaded</p>
+                    </div>
+                {% endif %}
+                {% if request.user.role == 'CCO' or letter.created_by == request.user %}
+                <div class="mt-3">
+                    <a href="{% url 'letters:upload_document' object.id %}" class="btn btn-sm btn-outline-primary w-100">
+                        <i class="fas fa-upload me-2"></i>Upload Document
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Approval Actions (for non-CCO approvers) -->
+            {% if can_approve and approval_type %}
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-check-double"></i> Approval Actions
+                </div>
+                {% if approval_type == 'radius' %}
+                <form method="post" action="{% url 'letters:radius_approve' radius_approval.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Comments</label>
+                        <textarea name="comments" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" name="action" value="approve" class="btn btn-success w-100 mb-2">
+                        <i class="fas fa-check me-2"></i>Approve Radius
+                    </button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger w-100">
+                        <i class="fas fa-times me-2"></i>Reject
+                    </button>
+                </form>
+                {% elif approval_type == 'sessions' %}
+                <form method="post" action="{% url 'letters:sessions_approve' sessions_approval.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Session Reference</label>
+                        <input type="text" name="session_reference" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Comments</label>
+                        <textarea name="comments" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" name="action" value="approve" class="btn btn-success w-100 mb-2">
+                        <i class="fas fa-check me-2"></i>Approve Sessions
+                    </button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger w-100">
+                        <i class="fas fa-times me-2"></i>Reject
+                    </button>
+                </form>
+                {% elif approval_type == 'client' %}
+                <form method="post" action="{% url 'letters:client_approve' letter.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Select Client</label>
+                        <select name="client_name" class="form-select">
+                            {% for client in pending_clients %}
+                            <option value="{{ client }}">{{ client }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Contact Person field removed -->
+                    <div class="mb-3">
+                        <label class="form-label">Comments (Optional)</label>
+                        <textarea name="comments" class="form-control" rows="2" placeholder="Add any comments..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-check me-2"></i>Mark Client Approved
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Final Approval Actions (CCO Only) -->
+            {% if request.user.role == 'CCO' and letter.status == 'Client_Pending' %}
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-check-double"></i> Final Approval
+                </div>
+                <form method="post" action="{% url 'letters:cco_final_approve' letter.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Comments</label>
+                        <textarea name="comments" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" name="action" value="approve" class="btn btn-success w-100 mb-2">
+                        <i class="fas fa-check-circle me-2"></i>Approve & Complete
+                    </button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger w-100">
+                        <i class="fas fa-undo me-2"></i>Return for Revision
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

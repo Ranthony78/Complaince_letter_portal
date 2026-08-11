@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block title %}Login - Letter Portal{% endblock %}
+
+{% block login_content %}
+<div class="login-container">
+    <div class="login-wrapper">
+        <!-- Left Side - Branding & Features -->
+        <div class="login-brand">
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <h1 class="brand-title">Letter <span>Portal</span></h1>
+                </div>
+                <p class="brand-tagline">Compliance Management System</p>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>FACS & Artiva Systems</h4>
+                            <p>Dual letter management systems with complete tracking</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Multi-level Approvals</h4>
+                            <p>Radius, Sessions, Client, and CCO approval workflows</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Version Control</h4>
+                            <p>Complete letter version history with PDF archives</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Role-based Access</h4>
+                            <p>CCO, Representatives, Reviewers, and Client Managers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="brand-footer">
+                    <p>© {% now "Y" %} Radius Global Solutions. All rights reserved.</p>
+                    <small>Secure Compliance Management Solution</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="login-form-wrapper">
+            <div class="login-form-container">
+                <div class="form-header">
+                    <div class="organization-logo">
+                        <i class="fas fa-envelope-open-text" style="font-size: 48px; color: #4361ee;"></i>
+                    </div>
+                    <h2>Welcome Back!</h2>
+                    <p>Please login to your account</p>
+                </div>
+
+                <form method="post" class="login-form" id="loginForm" action="{% url 'accounts:login' %}">
+                    {% csrf_token %}
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="id_username" class="form-label">
+                            <i class="fas fa-user"></i> Username or Email
+                        </label>
+                        <input type="text"
+                               name="username"
+                               id="id_username"
+                               class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                               placeholder="Enter your username or email"
+                               value="{{ form.username.value|default:'' }}"
+                               required
+                               autofocus>
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>Use your registered username or email address
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_password" class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="password-input-wrapper">
+                            <input type="password"
+                                   name="password"
+                                   id="id_password"
+                                   class="form-control {% if form.password.errors %}is-invalid{% endif %}"
+                                   placeholder="Enter your password"
+                                   required>
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="far fa-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-options">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="{% url 'accounts:password_reset' %}" class="forgot-password">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+                    </button>
+
+                    <div class="form-footer">
+                        <p>
+                            Need help?
+                            <a href="{% url 'accounts:help' %}" class="register-link">
+                                Contact Support <i class="fas fa-headset"></i>
+                            </a>
+                        </p>
+                    </div>
+                </form>
+
+                <div class="system-status">
+                    <div class="status-item">
+                        <span class="status-dot"></span>
+                        <span>System Status: <strong class="text-success">Operational</strong></span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Secure SSL</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Session: 24 Hours</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('id_password');
+        const toggleIcon = document.getElementById('togglePasswordIcon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+
+    // Add loading state to form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('.btn-login');
+        submitBtn.classList.add('loading');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+    });
+
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(alert => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
+
+    // Focus on username field on page load
+    document.getElementById('id_username').focus();
+
+    // Handle Enter key press
+    document.getElementById('id_password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('loginForm').submit();
+        }
+    });
+</script>
+{% endblock %}

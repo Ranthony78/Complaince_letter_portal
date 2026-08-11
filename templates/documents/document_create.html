@@ -1,0 +1,137 @@
+<!-- templates/documents/document_create.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Document{% endblock %}
+
+{% block page_title %}Create New Document{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'documents:document_management' %}">Document Management</a></li>
+<li class="breadcrumb-item active">Create Document</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h3>Create New Document</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Title *</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Document Type *</label>
+                        <select name="document_type" class="form-select" required>
+                            <option value="">Select Type</option>
+                            {% for type, label in document_types %}
+                            <option value="{{ type }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">PDF File</label>
+                        <input type="file" name="pdf_file" class="form-control" accept=".pdf">
+                        <small class="text-muted">Upload PDF document</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">External URL (for vendor links)</label>
+                        <input type="url" name="external_url" class="form-control" placeholder="https://...">
+                        <small class="text-muted">For external links instead of PDF</small>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Version</label>
+                        <input type="text" name="version" class="form-control" value="1.0">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input type="checkbox" name="is_public" class="form-check-input" id="is_public" checked>
+                            <label class="form-check-label" for="is_public">Make this document public (all users can view)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input type="checkbox" name="is_active" class="form-check-input" id="is_active" checked>
+                            <label class="form-check-label" for="is_active">Active (visible to users)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Create Document</button>
+                    <a href="{% url 'documents:document_management' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid var(--gray-light);
+    padding: 0.6rem 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn {
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+</style>
+{% endblock %}

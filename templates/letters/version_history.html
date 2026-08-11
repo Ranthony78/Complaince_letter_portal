@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Version History - {{ letter.letter_code }}{% endblock %}
+
+{% block page_title %}Version History: {{ letter.letter_code }}{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:list' %}">Letters</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:detail' letter.id %}">{{ letter.letter_code }}</a></li>
+<li class="breadcrumb-item active">Versions</li>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'letters:create_version' letter.id %}" class="btn btn-primary">
+    <i class="fas fa-plus-circle me-2"></i>Create New Version
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="version-timeline-container">
+    {% for version in versions %}
+    <div class="version-timeline-item {% if forloop.first %}latest{% endif %}">
+        <div class="timeline-marker">
+            <div class="marker-dot"></div>
+            {% if not forloop.last %}
+            <div class="marker-line"></div>
+            {% endif %}
+        </div>
+        <div class="timeline-content">
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-badge">{{ version.version_number }}</div>
+                    <div class="version-date">
+                        <i class="far fa-calendar-alt me-1"></i>{{ version.version_date|date:"F d, Y H:i" }}
+                    </div>
+                </div>
+                <div class="version-body">
+                    <div class="version-author">
+                        <i class="fas fa-user me-1"></i>{{ version.version_author.get_full_name|default:version.version_author.username }}
+                    </div>
+                    {% if version.version_note %}
+                    <div class="version-note mt-2">
+                        <strong>Notes:</strong>
+                        <p class="mb-0">{{ version.version_note }}</p>
+                    </div>
+                    {% endif %}
+                    {% if version.revision_reason %}
+                    <div class="version-reason mt-2">
+                        <strong>Reason:</strong>
+                        <p class="mb-0">{{ version.revision_reason }}</p>
+                    </div>
+                    {% endif %}
+                    {% if version.changes_from_previous %}
+                    <div class="version-changes mt-2">
+                        <strong>Changes:</strong>
+                        <pre class="small text-muted mt-1">{{ version.changes_from_previous }}</pre>
+                    </div>
+                    {% endif %}
+                    {% if version.pdf_copy %}
+                    <div class="version-actions mt-3">
+                        <a href="{{ version.pdf_copy.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                            <i class="fas fa-file-pdf me-1"></i>Download PDF
+                        </a>
+                        <a href="{% url 'letters:compare_versions' letter.id %}?version1={{ version.id }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-code-branch me-1"></i>Compare
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state text-center py-5">
+        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+        <h4>No versions yet</h4>
+        <p class="text-muted">Create a new version to start tracking changes.</p>
+        <a href="{% url 'letters:create_version' letter.id %}" class="btn btn-primary mt-3">
+            <i class="fas fa-plus-circle me-2"></i>Create First Version
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.version-timeline-container {
+    position: relative;
+    padding: 20px 0;
+}
+
+.version-timeline-item {
+    display: flex;
+    margin-bottom: 0;
+    position: relative;
+}
+
+.timeline-marker {
+    position: relative;
+    width: 40px;
+    flex-shrink: 0;
+}
+
+.marker-dot {
+    width: 16px;
+    height: 16px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px var(--primary-color);
+    position: relative;
+    z-index: 2;
+}
+
+.version-timeline-item.latest .marker-dot {
+    background: var(--success-color);
+    box-shadow: 0 0 0 3px var(--success-color);
+    animation: pulse 2s infinite;
+}
+
+.marker-line {
+    position: absolute;
+    top: 16px;
+    left: 7px;
+    width: 2px;
+    height: calc(100% + 30px);
+    background: linear-gradient(180deg, var(--primary-color), var(--gray-light));
+}
+
+.version-timeline-item:last-child .marker-line {
+    display: none;
+}
+
+.timeline-content {
+    flex: 1;
+    padding-bottom: 30px;
+}
+
+.version-card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.version-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.version-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.version-badge {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.version-date {
+    font-size: 12px;
+    color: var(--gray-color);
+}
+
+.version-body {
+    padding: 20px;
+}
+
+.version-author {
+    font-size: 13px;
+    color: var(--gray-color);
+}
+
+.version-note p, .version-reason p {
+    font-size: 14px;
+    color: var(--dark-color);
+}
+
+.version-changes pre {
+    background: var(--light-color);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+}
+</style>
+{% endblock %}

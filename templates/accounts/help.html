@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Help & Support - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.help-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.help-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.help-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.help-header p {
+    color: var(--gray-color);
+    font-size: 16px;
+}
+
+.help-section {
+    background: white;
+    border-radius: 24px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.help-section h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.help-section h3 i {
+    color: var(--primary-color);
+}
+
+.help-card {
+    background: var(--light-color);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.help-card:hover {
+    transform: translateX(5px);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+}
+
+.help-card h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.help-card p {
+    color: var(--gray-color);
+    font-size: 14px;
+    margin: 0;
+}
+
+.faq-item {
+    border-bottom: 1px solid var(--gray-light);
+    padding: 15px 0;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-question {
+    font-weight: 600;
+    color: var(--dark-color);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.faq-question:hover {
+    color: var(--primary-color);
+}
+
+.faq-answer {
+    display: none;
+    padding-top: 10px;
+    color: var(--gray-color);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.faq-answer.show {
+    display: block;
+}
+
+.contact-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.contact-card i {
+    font-size: 48px;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.contact-card h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.contact-card p {
+    color: var(--gray-color);
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}
+
+{% block page_title %}Help & Support{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item">
+    <a href="{% url 'dashboard:index' %}" class="text-decoration-none">
+        <i class="fas fa-home me-1"></i>Dashboard
+    </a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+    <i class="fas fa-question-circle me-1"></i>Help & Support
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="help-container">
+    <div class="help-header">
+        <h1>How can we help you?</h1>
+        <p>Find answers to common questions and get support</p>
+    </div>
+
+    <!-- Quick Guides -->
+    <div class="help-section">
+        <h3><i class="fas fa-book-open"></i> Quick Guides</h3>
+        {% for article in articles %}
+        <div class="help-card" onclick="window.location.href='#'">
+            <h4><i class="fas fa-file-alt"></i> {{ article.title }}</h4>
+            <p>{{ article.content }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="help-section">
+        <h3><i class="fas fa-question-circle"></i> Frequently Asked Questions</h3>
+        {% for faq in faqs %}
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleAnswer(this)">
+                <span>{{ faq.question }}</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                {{ faq.answer }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Contact Support -->
+    <div class="help-section">
+        <h3><i class="fas fa-headset"></i> Need More Help?</h3>
+        <div class="contact-card">
+            <i class="fas fa-envelope"></i>
+            <h4>Contact Support Team</h4>
+            <p>Our support team is available 24/7 to assist you</p>
+            <a href="mailto:support@letterportal.com" class="btn btn-primary">
+                <i class="fas fa-envelope me-2"></i>Email Support
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleAnswer(element) {
+    const answer = element.nextElementSibling;
+    const icon = element.querySelector('i');
+    answer.classList.toggle('show');
+    icon.classList.toggle('fa-chevron-down');
+    icon.classList.toggle('fa-chevron-up');
+}
+</script>
+{% endblock %}

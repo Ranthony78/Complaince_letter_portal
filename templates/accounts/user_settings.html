@@ -1,0 +1,626 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Account Settings - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.settings-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.settings-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+}
+
+.settings-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.settings-header {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.settings-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-header h3 i {
+    color: var(--primary-color);
+    font-size: 20px;
+}
+
+.settings-header p {
+    margin: 8px 0 0 0;
+    font-size: 13px;
+    color: var(--gray-color);
+}
+
+.settings-body {
+    padding: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-label i {
+    color: var(--primary-color);
+    width: 24px;
+}
+
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid var(--gray-light);
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+    background: var(--light-color);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+    background: white;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.form-check-input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.form-check-label {
+    color: var(--dark-color);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.form-text {
+    font-size: 11px;
+    color: var(--gray-color);
+    margin-top: 5px;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    border: none;
+    border-radius: 12px;
+    padding: 10px 24px;
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.divider {
+    height: 1px;
+    background: var(--gray-light);
+    margin: 20px 0;
+}
+
+.alert {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+}
+
+.alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+.alert-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid #3b82f6;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--gray-light);
+    transition: 0.3s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.setting-row:last-child {
+    border-bottom: none;
+}
+
+.setting-info {
+    flex: 1;
+}
+
+.setting-title {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 4px;
+}
+
+.setting-description {
+    font-size: 12px;
+    color: var(--gray-color);
+}
+
+.setting-control {
+    margin-left: 20px;
+}
+
+/* Radio Group */
+.radio-group {
+    display: flex;
+    gap: 20px;
+    margin-top: 8px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.radio-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.radio-option label {
+    color: var(--dark-color);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-card {
+        margin: 0 15px 24px;
+    }
+    
+    .settings-body {
+        padding: 20px;
+    }
+    
+    .setting-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .setting-control {
+        margin-left: 0;
+    }
+    
+    .radio-group {
+        flex-wrap: wrap;
+    }
+}
+</style>
+{% endblock %}
+
+{% block page_title %}Account Settings{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item">
+    <a href="{% url 'dashboard:index' %}" class="text-decoration-none">
+        <i class="fas fa-home me-1"></i>Dashboard
+    </a>
+</li>
+<li class="breadcrumb-item">
+    <a href="{% url 'accounts:profile' %}" class="text-decoration-none">
+        <i class="fas fa-user me-1"></i>My Profile
+    </a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+    <i class="fas fa-cog me-1"></i>Account Settings
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <!-- Notification Settings Card -->
+    <div class="settings-card">
+        <div class="settings-header">
+            <h3><i class="fas fa-bell"></i> Notification Preferences</h3>
+            <p>Choose which notifications you want to receive</p>
+        </div>
+        <div class="settings-body">
+            <form method="post" action="{% url 'accounts:user_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="notification_settings" value="1">
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Email Notifications</div>
+                        <div class="setting-description">Receive email notifications for important updates</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="email_notifications" {% if user.notification_preferences.email_notifications|default:True %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Approval Needed</div>
+                        <div class="setting-description">Get notified when your approval is required</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="notify_approval_needed" {% if user.notification_preferences.approval_needed|default:True %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Approval Completed</div>
+                        <div class="setting-description">Get notified when your requests are approved</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="notify_approval_completed" {% if user.notification_preferences.approval_completed|default:True %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Revision Needed</div>
+                        <div class="setting-description">Get notified when revisions are requested</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="notify_revision_needed" {% if user.notification_preferences.revision_needed|default:True %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">Delegated Tasks</div>
+                        <div class="setting-description">Get notified when tasks are delegated to you</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="notify_delegated" {% if user.notification_preferences.delegated|default:True %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title">System Alerts</div>
+                        <div class="setting-description">Receive important system notifications</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="notify_system_alert" {% if user.notification_preferences.system_alert|default:True %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Digest Frequency</label>
+                    <select name="email_digest_frequency" class="form-select">
+                        <option value="instant" {% if user.notification_preferences.email_digest_frequency == 'instant' %}selected{% endif %}>Instant</option>
+                        <option value="daily" {% if user.notification_preferences.email_digest_frequency == 'daily' %}selected{% endif %}>Daily Digest</option>
+                        <option value="weekly" {% if user.notification_preferences.email_digest_frequency == 'weekly' %}selected{% endif %}>Weekly Digest</option>
+                    </select>
+                    <div class="form-text">How often you want to receive email summaries</div>
+                </div>
+                
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save me-2"></i>Save Notification Settings
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Security Settings Card -->
+    <div class="settings-card">
+        <div class="settings-header">
+            <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
+            <p>Manage your account security preferences</p>
+        </div>
+        <div class="settings-body">
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Two-Factor Authentication (2FA)</div>
+                    <div class="setting-description">Add an extra layer of security to your account</div>
+                </div>
+                <div class="setting-control">
+                    <a href="#" class="btn btn-outline-primary btn-sm">Configure</a>
+                </div>
+            </div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Login Alerts</div>
+                    <div class="setting-description">Get notified when someone logs into your account</div>
+                </div>
+                <div class="setting-control">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="loginAlerts" {% if user.notification_preferences.login_alerts|default:True %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Session Timeout</div>
+                    <div class="setting-description">Automatically log out after period of inactivity</div>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" style="width: 120px;">
+                        <option value="30">30 minutes</option>
+                        <option value="60" selected>1 hour</option>
+                        <option value="120">2 hours</option>
+                        <option value="240">4 hours</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Change Password</div>
+                    <div class="setting-description">Update your password regularly to keep your account secure</div>
+                </div>
+                <div class="setting-control">
+                    <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-key me-1"></i>Change
+                    </a>
+                </div>
+            </div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Login History</div>
+                    <div class="setting-description">View recent login activity on your account</div>
+                </div>
+                <div class="setting-control">
+                    <a href="{% url 'accounts:login_history' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-history me-1"></i>View
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Display Settings Card -->
+    <div class="settings-card">
+        <div class="settings-header">
+            <h3><i class="fas fa-palette"></i> Display Settings</h3>
+            <p>Customize how the application looks</p>
+        </div>
+        <div class="settings-body">
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Dark Mode</div>
+                    <div class="setting-description">Switch between light and dark theme</div>
+                </div>
+                <div class="setting-control">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="theme" id="themeLight" value="light" checked>
+                            <label for="themeLight">Light</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="theme" id="themeDark" value="dark">
+                            <label for="themeDark">Dark</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="theme" id="themeAuto" value="auto">
+                            <label for="themeAuto">System Default</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Items Per Page</div>
+                    <div class="setting-description">Number of items to display in lists</div>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" style="width: 100px;">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Date Format</div>
+                    <div class="setting-description">Choose your preferred date display format</div>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" style="width: 180px;">
+                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                        <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                        <option value="MMM DD, YYYY">MMM DD, YYYY</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn-save" onclick="showSaveMessage()">
+                <i class="fas fa-save me-2"></i>Save Display Settings
+            </button>
+        </div>
+    </div>
+    
+    <!-- Danger Zone -->
+    <div class="settings-card" style="border-color: rgba(244, 67, 54, 0.3);">
+        <div class="settings-header" style="background: rgba(244, 67, 54, 0.05);">
+            <h3 style="color: var(--danger-color);"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+            <p>Irreversible account actions</p>
+        </div>
+        <div class="settings-body">
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Deactivate Account</div>
+                    <div class="setting-description">Temporarily disable your account. You can reactivate it later.</div>
+                </div>
+                <div class="setting-control">
+                    <button class="btn btn-outline-danger btn-sm" onclick="deactivateAccount()">
+                        Deactivate
+                    </button>
+                </div>
+            </div>
+            
+            <div class="setting-row">
+                <div class="setting-info">
+                    <div class="setting-title">Delete Account</div>
+                    <div class="setting-description">Permanently delete your account and all associated data.</div>
+                </div>
+                <div class="setting-control">
+                    <button class="btn btn-danger btn-sm" onclick="deleteAccount()">
+                        <i class="fas fa-trash-alt me-1"></i>Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showSaveMessage() {
+    alert('Settings saved successfully!');
+}
+
+function deactivateAccount() {
+    if (confirm('Are you sure you want to deactivate your account? You can reactivate it later by contacting support.')) {
+        alert('Account deactivation request submitted.');
+    }
+}
+
+function deleteAccount() {
+    if (confirm('WARNING: This action is permanent and cannot be undone. All your data will be deleted. Are you absolutely sure?')) {
+        if (confirm('Please confirm again: Type "DELETE" to proceed')) {
+            const confirmation = prompt('Type DELETE to confirm account deletion:');
+            if (confirmation === 'DELETE') {
+                alert('Account deletion request submitted.');
+            }
+        }
+    }
+}
+
+// Save settings via AJAX (optional)
+document.querySelectorAll('.toggle-switch input, select').forEach(el => {
+    el.addEventListener('change', function() {
+        // Auto-save logic could be added here
+        console.log('Setting changed:', this.name || this.id);
+    });
+});
+</script>
+{% endblock %}

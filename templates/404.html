@@ -1,0 +1,49 @@
+<!-- templates/404.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found - Letter Portal{% endblock %}
+
+{% block content %}
+<div class="error-container text-center py-5">
+    <div class="error-code">404</div>
+    <div class="error-icon">
+        <i class="fas fa-compass"></i>
+    </div>
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-message">The page you're looking for doesn't exist or has been moved.</p>
+    <a href="{% url 'dashboard:index' %}" class="btn btn-primary">
+        <i class="fas fa-home me-2"></i>Back to Dashboard
+    </a>
+</div>
+
+<style>
+.error-container {
+    max-width: 500px;
+    margin: 80px auto;
+}
+.error-code {
+    font-size: 120px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+}
+.error-icon i {
+    font-size: 80px;
+    color: var(--gray-light);
+    margin: 20px 0;
+}
+.error-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+.error-message {
+    color: var(--gray-color);
+    margin-bottom: 30px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ letter.letter_code }} - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.letter-header {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    border-radius: 24px;
+    padding: 25px 30px;
+    color: white;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.letter-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 80%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+.letter-code {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.letter-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.info-sidebar {
+    position: sticky;
+    top: 20px;
+}
+
+.info-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.info-title {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--gray-color);
+    font-size: 13px;
+}
+
+.info-value {
+    font-weight: 500;
+    color: var(--dark-color);
+    text-align: right;
+}
+
+.version-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.version-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--primary-color), var(--sidebar-middle));
+}
+
+.version-item {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.version-badge {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.version-content {
+    background: var(--light-color);
+    border-radius: 16px;
+    padding: 15px;
+    margin-left: 10px;
+}
+
+.version-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.version-date {
+    font-size: 11px;
+    color: var(--gray-color);
+    margin-bottom: 8px;
+}
+
+.approval-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.approval-approved {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.approval-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.approval-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+</style>
+{% endblock %}
+
+{% block page_title %}{{ letter.letter_code }}{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:list' %}">Letters</a></li>
+<li class="breadcrumb-item active">{{ letter.letter_code }}</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="dropdown">
+    <button class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+        <i class="fas fa-download me-2"></i>Actions
+    </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#"><i class="fas fa-print me-2"></i>Print</a></li>
+        <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>Export PDF</a></li>
+        {% if letter.status == 'Draft' and letter.created_by == request.user %}
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-warning" href="{% url 'letters:edit' letter.id %}"><i class="fas fa-edit me-2"></i>Edit</a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <!-- Letter Information -->
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-info-circle"></i> Letter Information
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-row">
+                        <span class="info-label">Letter Code</span>
+                        <span class="info-value">{{ letter.letter_code }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">System Type</span>
+                        <span class="info-value">{{ letter.system_type }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Communication Type</span>
+                        <span class="info-value">{{ letter.get_communication_type_display }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Communication Code</span>
+                        <span class="info-value">{{ letter.communication_code }}</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">
+                            <span class="status-indicator status-{{ letter.status|lower }}">
+                                {{ letter.get_status_display }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Current Version</span>
+                        <span class="info-value">{{ letter.current_version }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Created By</span>
+                        <span class="info-value">{{ letter.created_by.get_full_name|default:letter.created_by.username }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Created Date</span>
+                        <span class="info-value">{{ letter.created_at|date:"F d, Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Description -->
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-file-alt"></i> Document Description
+            </div>
+            <p>{{ letter.document_description }}</p>
+        </div>
+
+        <!-- Letter Description -->
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-align-left"></i> Letter Description
+            </div>
+            <p>{{ letter.letter_description }}</p>
+        </div>
+
+        <!-- Version History -->
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-history"></i> Version History
+            </div>
+            <div class="version-timeline">
+                {% for version in versions %}
+                <div class="version-item">
+                    <div class="version-badge">{{ version.version_number }}</div>
+                    <div class="version-content">
+                        <div class="version-title">{{ version.version_note|default:"Version created" }}</div>
+                        <div class="version-date">
+                            <i class="far fa-clock me-1"></i>{{ version.version_date|date:"M d, Y H:i" }}
+                            by {{ version.version_author.get_full_name|default:version.version_author.username }}
+                        </div>
+                        {% if version.revision_reason %}
+                        <div class="small text-muted mt-1">
+                            <i class="fas fa-info-circle me-1"></i>Reason: {{ version.revision_reason }}
+                        </div>
+                        {% endif %}
+                        {% if version.pdf_copy %}
+                        <a href="{{ version.pdf_copy.url }}" class="btn btn-sm btn-outline-primary mt-2" target="_blank">
+                            <i class="fas fa-file-pdf me-1"></i>Download PDF
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="fas fa-history fa-2x text-muted mb-2"></i>
+                    <p class="text-muted">No version history available</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="info-sidebar">
+            <!-- Regulatory Info -->
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-gavel"></i> Regulatory Information
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Regulatory Body</span>
+                    <span class="info-value">{{ letter.regulatory_body }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Timing</span>
+                    <span class="info-value">{{ letter.get_timing_display }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Production Date</span>
+                    <span class="info-value">{{ letter.production_date|date:"M d, Y" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Source</span>
+                    <span class="info-value">{{ letter.source }}</span>
+                </div>
+            </div>
+
+            <!-- Approvals Status -->
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-check-double"></i> Approvals
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Radius Approval</span>
+                    <span class="info-value">
+                        {% if radius_approval %}
+                            {% if radius_approval.approval_status == 'Approved' %}
+                                <span class="approval-badge approval-approved">
+                                    <i class="fas fa-check-circle"></i> Approved
+                                </span>
+                                <div class="small text-muted mt-1">{{ radius_approval.approval_date|date:"M d, Y" }}</div>
+                            {% else %}
+                                <span class="approval-badge approval-pending">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span class="approval-badge approval-pending">Not Started</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Sessions Approval</span>
+                    <span class="info-value">
+                        {% if sessions_approval %}
+                            {% if sessions_approval.approval_status == 'Approved' %}
+                                <span class="approval-badge approval-approved">
+                                    <i class="fas fa-check-circle"></i> Approved
+                                </span>
+                                <div class="small text-muted mt-1">{{ sessions_approval.approval_date|date:"M d, Y" }}</div>
+                            {% else %}
+                                <span class="approval-badge approval-pending">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span class="approval-badge approval-pending">Not Started</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-paperclip"></i> Documents
+                </div>
+                {% if documents %}
+                    {% for doc in documents %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                        <div>
+                            <i class="fas fa-file-{{ doc.file_type }} text-primary me-2"></i>
+                            {{ doc.file_name }}
+                            <div class="small text-muted">{{ doc.get_document_type_display }}</div>
+                        </div>
+                        <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-file-upload fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">No documents uploaded</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Ticket Info -->
+            {% if ticket %}
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-ticket-alt"></i> Ticket Information
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Ticket Number</span>
+                    <span class="info-value">{{ ticket.ticket_number }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Open Date</span>
+                    <span class="info-value">{{ ticket.open_date|date:"M d, Y" }}</span>
+                </div>
+                {% if ticket.completed_date %}
+                <div class="info-row">
+                    <span class="info-label">Completed Date</span>
+                    <span class="info-value">{{ ticket.completed_date|date:"M d, Y" }}</span>
+                </div>
+                {% endif %}
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    <span class="info-value">{{ ticket.get_status_display }}</span>
+                </div>
+                {% if ticket.notes %}
+                <div class="mt-2">
+                    <small class="text-muted">Notes:</small>
+                    <p class="small mb-0 mt-1">{{ ticket.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

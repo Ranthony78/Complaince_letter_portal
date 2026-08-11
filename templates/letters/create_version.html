@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create New Version - {{ letter.letter_code }}{% endblock %}
+
+{% block page_title %}Create New Version: {{ letter.letter_code }}{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:list' %}">Letters</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:detail' letter.id %}">{{ letter.letter_code }}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:version_history' letter.id %}">Versions</a></li>
+<li class="breadcrumb-item active">Create Version</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="info-card">
+            <div class="info-title">
+                <i class="fas fa-code-branch"></i> Create New Version
+            </div>
+            
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-info-circle me-2"></i>
+                Current version: <strong>{{ letter.current_version }}</strong><br>
+                New version will be: <strong>{{ next_version }}</strong>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group mb-3">
+                    <label class="form-label">Version Notes <span class="required">*</span></label>
+                    {{ form.version_note }}
+                    <div class="help-text">Describe the changes made in this version</div>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label class="form-label">Revision Reason</label>
+                    {{ form.revision_reason }}
+                </div>
+                
+                <div class="form-group mb-4">
+                    <label class="form-label">Upload PDF Copy</label>
+                    {{ form.pdf_copy }}
+                    <div class="help-text">Upload a PDF version of this letter (optional)</div>
+                </div>
+                
+                <div class="d-flex gap-3 justify-content-end">
+                    <a href="{% url 'letters:version_history' letter.id %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Create Version {{ next_version }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

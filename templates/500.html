@@ -1,0 +1,19 @@
+<!-- templates/500.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Server Error - Letter Portal{% endblock %}
+
+{% block content %}
+<div class="error-container text-center py-5">
+    <div class="error-code">500</div>
+    <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h1 class="error-title">Server Error</h1>
+    <p class="error-message">Something went wrong on our end. Please try again later.</p>
+    <a href="{% url 'dashboard:index' %}" class="btn btn-primary">
+        <i class="fas fa-home me-2"></i>Back to Dashboard
+    </a>
+</div>
+{% endblock %}

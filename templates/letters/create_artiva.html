@@ -1,0 +1,923 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Artiva Letter - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+.form-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.form-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.form-header {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.form-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-header h3 i {
+    color: var(--primary-color);
+    font-size: 20px;
+}
+
+.form-body {
+    padding: 25px;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -12px 20px;
+}
+
+.form-col {
+    flex: 1;
+    padding: 0 12px;
+    min-width: 200px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-label .required {
+    color: var(--danger-color);
+    margin-left: 4px;
+}
+
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid var(--gray-light);
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+    background: var(--light-color);
+    width: 100%;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+    background: white;
+}
+
+.radio-group, .checkbox-group {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.radio-option, .checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.radio-option input, .checkbox-option input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.radio-option label, .checkbox-option label {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--dark-color);
+}
+
+.code-preview {
+    background: var(--light-color);
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin-top: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.code-preview span {
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.version-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.version-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.version-item:last-child {
+    border-bottom: none;
+}
+
+.version-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.version-badge {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    border: none;
+    border-radius: 12px;
+    padding: 12px 28px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-draft {
+    background: white;
+    border: 2px solid var(--gray-light);
+    border-radius: 12px;
+    padding: 12px 28px;
+    color: var(--gray-color);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.help-text {
+    font-size: 11px;
+    color: var(--gray-color);
+    margin-top: 5px;
+}
+
+.version-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+@media (max-width: 992px) {
+    .form-row {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block page_title %}Create Artiva Letter{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:list' %}">Letters</a></li>
+<li class="breadcrumb-item active">Create Artiva</li>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <form method="post" enctype="multipart/form-data" id="artivaForm">
+        {% csrf_token %}
+
+        <!-- Section 1: Basic Information -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+            </div>
+            <div class="form-body">
+                <!-- Row 1: Letter/Email/SMS Code Field -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">
+                            Letter/Email/SMS Code <span class="required">*</span>
+                            <span class="version-tag">Version Identifier</span>
+                        </label>
+                        <input type="text" name="communication_code" id="communication_code" class="form-control"
+                               placeholder="e.g., ART-2024-001, Email-ART-001, SMS-ART-001" required>
+                        <div class="help-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            This code helps track different versions of the same communication.
+                            For revisions, use the same base code with version suffix.
+                        </div>
+                        <div class="code-preview" id="codePreview" style="display: none;">
+                            <i class="fas fa-code-branch me-2"></i>
+                            Version tracking: <span id="previewCode"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Communication Type + Creation/Revision -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Communication Type <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="communication_type" value="Letter" id="type_letter" checked>
+                                <label for="type_letter">Letter</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="communication_type" value="Email" id="type_email">
+                                <label for="type_email">Email</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="communication_type" value="SMS" id="type_sms">
+                                <label for="type_sms">SMS</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Creation/Revision <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="creation_type" value="Creation" id="creation" checked>
+                                <label for="creation">Creation (V.0)</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="creation_type" value="Revision" id="revision">
+                                <label for="revision">Revision (V.1, V.2...)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Creation/Revision Date + Regulatory + Timing -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Creation/Revision Date <span class="required">*</span></label>
+                        <input type="date" name="creation_date" class="form-control datepicker" value="{{ now|date:'Y-m-d' }}" required>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Regulatory <span class="required">*</span></label>
+                        {{ form.regulatory }}
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Timing <span class="required">*</span></label>
+                        {{ form.timing }}
+                    </div>
+                </div>
+
+                <!-- Row 4: Letter/Email/SMS + Letter Code -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Letter/Email/SMS <span class="required">*</span></label>
+                        {{ form.communication_subtype }}
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Letter Code <span class="required">*</span></label>
+                        <input type="text" name="letter_code" class="form-control" placeholder="Enter letter code" required>
+                        <div class="help-text">Unique identifier for this letter (e.g., ARTIVA-2024-001)</div>
+                    </div>
+                </div>
+
+                <!-- Row 5: Priority + Production Date + Source -->
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Priority <span class="required">*</span></label>
+                        {{ form.priority }}
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Production Date <span class="required">*</span></label>
+                        <input type="date" name="production_date" class="form-control datepicker" required>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Source <span class="required">*</span></label>
+                        {{ form.source }}
+                    </div>
+                </div>
+
+                <!-- Row 6: Letter Description -->
+                <div class="form-group">
+                    <label class="form-label">Letter Description <span class="required">*</span></label>
+                    <textarea name="letter_description" class="form-control" rows="4" placeholder="Detailed description of the letter content" required></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Radius & Sessions Approval -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-radar"></i> Radius & Sessions Approval</h3>
+                <p class="text-muted small mb-0">Only CCO can set approval dates</p>
+            </div>
+            <div class="form-body">
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">CCO or Representative</label>
+                        <select name="cco_representative" class="form-select select2" {% if request.user.role != 'CCO' %}disabled{% endif %}>
+                            <option value="">Select CCO or Representative</option>
+                            {% for user in cco_users %}
+                            <option value="{{ user.id }}" {% if radius_approval and radius_approval.cco_or_representative.id == user.id %}selected{% endif %}>
+                                {{ user.get_full_name|default:user.username }}
+                                {% if user.role == 'CCO' %} (CCO){% elif user.role == 'Representative' %} (Representative){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if request.user.role != 'CCO' %}
+                        <div class="help-text text-warning">Only CCO can assign approver</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Radius Approval Date</label>
+                        <input type="date" name="radius_approval_date"
+                               class="form-control datepicker {% if request.user.role == 'CCO' %}datepicker-enabled{% else %}datepicker-disabled{% endif %}"
+                               value="{{ radius_approval_date|default:'' }}"
+                               {% if request.user.role != 'CCO' %}readonly disabled{% endif %}>
+                        <div class="help-text">
+                            {% if request.user.role == 'CCO' %}
+                            <i class="fas fa-calendar-alt me-1"></i>Select the date when Radius approval was given
+                            {% else %}
+                            <i class="fas fa-lock me-1"></i>Only CCO can set the approval date
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Sessions Approval Date</label>
+                        <input type="date" name="sessions_approval_date"
+                               class="form-control datepicker {% if request.user.role == 'CCO' %}datepicker-enabled{% else %}datepicker-disabled{% endif %}"
+                               value="{{ sessions_approval_date|default:'' }}"
+                               {% if request.user.role != 'CCO' %}readonly disabled{% endif %}>
+                        <div class="help-text">
+                            {% if request.user.role == 'CCO' %}
+                            <i class="fas fa-calendar-alt me-1"></i>Select the date when Sessions approval was given
+                            {% else %}
+                            <i class="fas fa-lock me-1"></i>Only CCO can set the approval date
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comments Section for CCO -->
+                {% if request.user.role == 'CCO' %}
+                <div class="form-group mt-3">
+                    <label class="form-label">Approval Comments</label>
+                    <textarea name="approval_comments" class="form-control" rows="2" placeholder="Optional comments about the approval process">{{ approval_comments|default:'' }}</textarea>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Section 3: Ticket Information -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-ticket-alt"></i> Ticket Information</h3>
+            </div>
+            <div class="form-body">
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Ticket #</label>
+                        <input type="text" name="ticket_number" class="form-control" placeholder="Enter ticket number">
+                        <div class="help-text">Leave blank for auto-generation</div>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Ticket Open Date</label>
+                        <input type="datetime-local" name="ticket_open_date" class="form-control">
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Ticket Completed Date</label>
+                        <input type="datetime-local" name="ticket_completed_date" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Version Control -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-code-branch"></i> Version Control</h3>
+            </div>
+            <div class="form-body">
+                <div class="version-list" id="versionList">
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-history fa-2x mb-2"></i>
+                        <p>No prior versions available</p>
+                        <small>This will show version history when editing an existing letter</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: File Upload -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-upload"></i> File Upload</h3>
+            </div>
+            <div class="form-body">
+                <div class="form-group">
+                    <label class="form-label">Upload Document <span class="required">*</span></label>
+                    <input type="file" name="document" class="form-control" accept=".pdf,.doc,.docx" required>
+                    <div class="help-text">Supported formats: PDF, DOC, DOCX (Max 10MB)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Document Type</label>
+                    <select name="document_type" class="form-select">
+                        <option value="Original">Original Document</option>
+                        <option value="Revision">Revision Document</option>
+                        <option value="Supporting">Supporting Document</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea name="document_description" class="form-control" rows="2" placeholder="Optional description"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex gap-3 justify-content-end mt-4">
+            <a href="{% url 'letters:list' %}" class="btn-draft">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+            <button type="submit" name="action" value="draft" class="btn-draft">
+                <i class="fas fa-save me-2"></i>Save as Draft
+            </button>
+            <button type="submit" name="action" value="submit" class="btn-submit">
+                <i class="fas fa-paper-plane me-2"></i>Submit for Review
+            </button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+$(document).ready(function() {
+    // ========== USER ROLE DETECTION ==========
+    const userRole = "{{ request.user.role }}";
+    const isCCO = userRole === 'CCO';
+    const isRepresentative = userRole === 'Representative';
+    const isReviewer = userRole === 'InternalReviewer';
+    const isClientManager = userRole === 'ClientManager';
+    const isViewer = userRole === 'Viewer';
+
+    function getRoleDisplayName(role) {
+        const roles = {
+            'CCO': 'Chief Compliance Officer',
+            'Representative': 'CCO Representative',
+            'InternalReviewer': 'Internal Reviewer',
+            'ClientManager': 'Client Manager',
+            'Viewer': 'Viewer'
+        };
+        return roles[role] || role;
+    }
+
+    // ========== SHOW ROLE-BASED WELCOME MESSAGE ==========
+    if (!isCCO && !sessionStorage.getItem('welcomeShown')) {
+        sessionStorage.setItem('welcomeShown', 'true');
+        Swal.fire({
+            title: 'Welcome!',
+            html: `
+                <div class="text-center">
+                    <i class="fas fa-info-circle fa-3x text-info mb-3"></i>
+                    <p>You are logged in as: <strong>${getRoleDisplayName(userRole)}</strong></p>
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-lock me-2"></i>
+                        <strong>Approval Date Restrictions:</strong><br>
+                        Only CCO can set approval dates. These fields will be disabled until a CCO reviews the letter.
+                    </div>
+                    <p class="text-muted small mt-3">You can still create and submit letters. The CCO will handle the approval process.</p>
+                </div>
+            `,
+            icon: 'info',
+            confirmButtonText: 'Got it',
+            allowOutsideClick: false
+        });
+    }
+
+    // ========== INITIALIZE DATE PICKERS ==========
+    flatpickr(".datepicker", {
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+
+    // ========== INITIALIZE SELECT2 ==========
+    $('.select2').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select an option',
+        allowClear: true
+    });
+
+    // ========== VERSION CODE PREVIEW AND TRACKING ==========
+    $('#communication_code').on('input', function() {
+        const code = $(this).val();
+        if (code) {
+            $('#codePreview').show();
+            $('#previewCode').text(code);
+
+            const creationType = $('input[name="creation_type"]:checked').val();
+            if (creationType === 'Creation') {
+                $('#previewCode').html(`${code} <small class="text-muted">(V.0)</small>`);
+            } else {
+                $('#previewCode').html(`${code} <small class="text-muted">(V.1, V.2...)</small>`);
+            }
+        } else {
+            $('#codePreview').hide();
+        }
+    });
+
+    // Update version preview when creation type changes
+    $('input[name="creation_type"]').change(function() {
+        const code = $('#communication_code').val();
+        if (code) {
+            const creationType = $(this).val();
+            if (creationType === 'Creation') {
+                $('#previewCode').html(`${code} <small class="text-muted">(V.0)</small>`);
+            } else {
+                $('#previewCode').html(`${code} <small class="text-muted">(V.1, V.2...)</small>`);
+            }
+        }
+    });
+
+    // ========== CLIENT CHECKBOX TOGGLE (FACS ONLY) ==========
+    $('.client-checkbox').change(function() {
+        const clientId = $(this).data('client');
+        const detailsDiv = $(`#client_details_${clientId}`);
+        if ($(this).is(':checked')) {
+            detailsDiv.addClass('show');
+        } else {
+            detailsDiv.removeClass('show');
+        }
+    });
+
+    // ========== ROLE-BASED UI CONTROLS ==========
+    if (!isCCO) {
+        // Disable all CCO-only fields
+        $('select[name="cco_representative"]').prop('disabled', true).addClass('disabled-field');
+        $('input[name="radius_approval_date"]').prop('disabled', true).addClass('disabled-field');
+        $('input[name="sessions_approval_date"]').prop('disabled', true).addClass('disabled-field');
+        $('textarea[name="approval_comments"]').prop('disabled', true);
+
+        // Add lock icons to disabled fields
+        $('.form-col').each(function() {
+            if ($(this).find('input[disabled], select[disabled]').length > 0) {
+                $(this).find('.form-label').append(' <i class="fas fa-lock text-danger ms-1" style="font-size: 12px;"></i>');
+            }
+        });
+
+        // Add warning banner for non-CCO users
+        if ($('.approval-section .form-body').length > 0) {
+            $('.approval-section .form-body').prepend(`
+                <div class="alert alert-warning mb-4" style="border-left: 4px solid #ffc107;">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-shield-alt fa-2x text-warning"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <strong class="text-warning">CCO Approval Required</strong>
+                            <p class="mb-0 small">As a non-CCO user, you cannot set approval dates. The CCO will review and set the approval dates after submission.</p>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+    } else {
+        // CCO user - add success banner
+        if ($('.approval-section .form-body').length > 0) {
+            $('.approval-section .form-body').prepend(`
+                <div class="alert alert-success mb-4" style="border-left: 4px solid #28a745;">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <strong class="text-success">CCO Access Granted</strong>
+                            <p class="mb-0 small">You have permission to set approval dates for this letter.</p>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+    }
+
+    // ========== SUBMIT HANDLING WITH ROLE-BASED VALIDATION ==========
+    let isSubmitting = false;
+
+    // Track which button was clicked
+    $('form button[type="submit"]').on('click', function() {
+        $(this).attr('clicked', 'true');
+        $(this).siblings().removeAttr('clicked');
+    });
+
+    // Form submission handler
+    $('form').on('submit', function(e) {
+        const action = $(this).find('button[type="submit"][clicked="true"]').val();
+
+        // Skip validation for draft saves
+        if (action !== 'submit') {
+            return true;
+        }
+
+        e.preventDefault();
+
+        // ========== FORM VALIDATION ==========
+        const requiredFields = ['communication_code', 'letter_code', 'production_date'];
+        let isValid = true;
+        let missingFields = [];
+
+        requiredFields.forEach(field => {
+            const value = $(`[name="${field}"]`).val();
+            if (!value) {
+                $(`[name="${field}"]`).addClass('is-invalid');
+                isValid = false;
+                missingFields.push(field.replace('_', ' ').toUpperCase());
+            } else {
+                $(`[name="${field}"]`).removeClass('is-invalid');
+            }
+        });
+
+        // Validate communication code format
+        const commCode = $('#communication_code').val();
+        if (commCode && !/^[A-Z0-9\-_]+$/i.test(commCode)) {
+            Swal.fire({
+                title: 'Invalid Communication Code',
+                text: 'Communication Code should contain only letters, numbers, hyphens, and underscores',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            isValid = false;
+        }
+
+        // Check if at least one client is selected for FACS form
+        if ($('#artivaForm').length > 0) {
+            const clientChecked = $('.client-checkbox:checked').length;
+            if (clientChecked === 0) {
+                Swal.fire({
+                    title: 'No Client Selected',
+                    text: 'Please select at least one client for approval',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            if (missingFields.length > 0) {
+                Swal.fire({
+                    title: 'Missing Required Fields',
+                    html: `Please fill in the following fields:<br><strong>${missingFields.join(', ')}</strong>`,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+            return false;
+        }
+
+        // ========== CCO SUBMISSION VALIDATION ==========
+        if (isCCO) {
+            const radiusDate = $('input[name="radius_approval_date"]').val();
+            const sessionsDate = $('input[name="sessions_approval_date"]').val();
+            const ccoRepresentative = $('select[name="cco_representative"]').val();
+
+            if (!radiusDate || !sessionsDate) {
+                Swal.fire({
+                    title: 'Missing Approval Dates',
+                    html: `
+                        <div class="text-center">
+                            <i class="fas fa-calendar-times fa-3x text-warning mb-3"></i>
+                            <p>As CCO, please set both approval dates before submitting.</p>
+                            <div class="alert alert-warning mt-3">
+                                <strong>Radius Approval Date:</strong> ${radiusDate || '<span class="text-danger">Not set</span>'}<br>
+                                <strong>Sessions Approval Date:</strong> ${sessionsDate || '<span class="text-danger">Not set</span>'}
+                            </div>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    confirmButtonText: 'Set Dates',
+                    showCancelButton: true,
+                    cancelButtonText: 'Submit Anyway'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('input[name="radius_approval_date"]').focus();
+                    } else {
+                        processSubmission(this, action);
+                    }
+                });
+                return;
+            }
+
+            if (!ccoRepresentative) {
+                Swal.fire({
+                    title: 'No Approver Selected',
+                    text: 'Please select a CCO or Representative as the approver',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // CCO confirmation
+            Swal.fire({
+                title: 'Submit Letter as CCO?',
+                html: `
+                    <div class="text-center">
+                        <i class="fas fa-check-double fa-3x text-success mb-3"></i>
+                        <p>You are about to submit this letter with the following approval dates:</p>
+                        <div class="alert alert-info mt-3">
+                            <strong>Radius Approval:</strong> ${radiusDate}<br>
+                            <strong>Sessions Approval:</strong> ${sessionsDate}<br>
+                            <strong>Approver:</strong> ${$('select[name="cco_representative"] option:selected').text()}
+                        </div>
+                        <p class="text-warning small mt-3">⚠️ Once submitted, the letter will be locked for editing.</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, Submit for Review',
+                cancelButtonText: 'No, Go Back'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processSubmission(this, action);
+                }
+            });
+        } else {
+            // Non-CCO submission
+            Swal.fire({
+                title: 'Submit Letter for CCO Review?',
+                html: `
+                    <div class="text-center">
+                        <i class="fas fa-paper-plane fa-3x text-primary mb-3"></i>
+                        <p>You are about to submit this letter for CCO review.</p>
+                        <div class="alert alert-warning mt-3">
+                            <i class="fas fa-clock me-2"></i>
+                            <strong>What happens next?</strong><br>
+                            1. A CCO will review your letter<br>
+                            2. The CCO will set the approval dates<br>
+                            3. You will be notified when review is complete
+                        </div>
+                        <p class="text-success small mt-3">✓ Your letter will be submitted successfully</p>
+                    </div>
+                `,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Submit for Review',
+                cancelButtonText: 'No, Keep Editing'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processSubmission(this, action);
+                }
+            });
+        }
+    });
+
+    function processSubmission(form, action) {
+        if (isSubmitting) {
+            Swal.fire('Please Wait', 'Your request is already being processed...', 'info');
+            return false;
+        }
+
+        isSubmitting = true;
+        const submitBtn = $(form).find('button[value="submit"]');
+        const originalText = submitBtn.html();
+        submitBtn.prop('disabled', true);
+        submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Submitting...');
+
+        // Show processing message
+        Swal.fire({
+            title: 'Submitting Letter...',
+            text: 'Please wait while we process your request',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Submit the form
+        form.submit();
+
+        // Re-enable after 15 seconds in case of error
+        setTimeout(function() {
+            if (isSubmitting) {
+                isSubmitting = false;
+                submitBtn.prop('disabled', false);
+                submitBtn.html(originalText);
+                Swal.close();
+            }
+        }, 15000);
+    }
+
+    // ========== REAL-TIME VALIDATION FOR CCO ==========
+    if (isCCO) {
+        $('input[name="radius_approval_date"], input[name="sessions_approval_date"]').on('change', function() {
+            const radiusDate = $('input[name="radius_approval_date"]').val();
+            const sessionsDate = $('input[name="sessions_approval_date"]').val();
+            const ccoRepresentative = $('select[name="cco_representative"]').val();
+
+            if (radiusDate && sessionsDate && ccoRepresentative) {
+                // Remove any existing success alert
+                $('.approval-success-alert').remove();
+                $('.approval-section .form-body').prepend(`
+                    <div class="alert alert-success approval-success-alert mb-3" style="animation: slideIn 0.3s ease-out;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Ready to Submit!</strong> All approval dates and approver have been set.
+                    </div>
+                `);
+                setTimeout(() => {
+                    $('.approval-success-alert').fadeOut(3000, function() { $(this).remove(); });
+                }, 5000);
+            }
+        });
+    }
+
+    // ========== CHECK FOR SUCCESSFUL SUBMISSION ==========
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('submitted') === 'success') {
+        Swal.fire({
+            title: 'Success!',
+            html: `
+                <div class="text-center">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <p>Your letter has been submitted successfully!</p>
+                    ${!isCCO ? `
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-bell me-2"></i>
+                            <strong>Next Steps:</strong><br>
+                            The CCO will review your letter and set the approval dates.<br>
+                            You will receive a notification once the review is complete.
+                        </div>
+                    ` : ''}
+                </div>
+            `,
+            icon: 'success',
+            confirmButtonText: 'Go to Dashboard'
+        }).then(() => {
+            window.location.href = '/';
+        });
+    }
+});
+
+// Add CSS animations
+$('<style>')
+    .prop('type', 'text/css')
+    .html(`
+        .disabled-field {
+            background-color: #e9ecef !important;
+            cursor: not-allowed !important;
+            opacity: 0.7;
+        }
+        .form-label i.fa-lock {
+            font-size: 12px;
+            vertical-align: middle;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .alert {
+            animation: slideIn 0.3s ease-out;
+        }
+    `)
+    .appendTo('head');
+</script>
+{% endblock %}

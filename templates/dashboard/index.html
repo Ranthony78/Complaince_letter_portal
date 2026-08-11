@@ -1,0 +1,1283 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+/* ========================================
+   GLOBAL & UTILITY STYLES
+   ======================================== */
+:root {
+    --radius-pending-color: #ffc107;
+    --sessions-pending-color: #fd7e14;
+    --client-pending-color: #20c997;
+    --cco-pending-color: #0d6efd;
+    --facs-color: #4361ee;
+    --artiva-color: #10b981;
+}
+
+/* Quick Action Cards */
+.quick-action-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-color: var(--primary-color);
+}
+
+.quick-action-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.quick-action-icon i {
+    font-size: 28px;
+    color: var(--primary-color);
+}
+
+.quick-action-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--dark-color);
+}
+
+.quick-action-desc {
+    font-size: 12px;
+    color: var(--gray-color);
+}
+
+/* Stats Mini Cards */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-mini-card {
+    background: white;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stat-mini-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.stat-mini-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-mini-icon.radius { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+.stat-mini-icon.sessions { background: rgba(253, 126, 20, 0.1); color: #fd7e14; }
+.stat-mini-icon.client { background: rgba(32, 201, 151, 0.1); color: #20c997; }
+.stat-mini-icon.cco { background: rgba(13, 110, 253, 0.1); color: #0d6efd; }
+
+.stat-mini-info h4 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark-color);
+}
+
+.stat-mini-info p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--gray-color);
+}
+
+/* Section Headers */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+/* System Badges */
+.system-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.system-facs {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.system-artiva {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+/* ========================================
+   PENDING APPROVALS SECTION
+   ======================================== */
+.pending-section-wrapper {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
+    border-radius: 24px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.pending-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.pending-column {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+}
+
+.pending-column:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.pending-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid;
+}
+
+.pending-column-header.radius { border-bottom-color: var(--radius-pending-color); }
+.pending-column-header.sessions { border-bottom-color: var(--sessions-pending-color); }
+.pending-column-header.client { border-bottom-color: var(--client-pending-color); }
+.pending-column-header.cco { border-bottom-color: var(--cco-pending-color); }
+
+.pending-column-title {
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pending-column-title i {
+    font-size: 18px;
+}
+
+.pending-column-title.radius i,
+.pending-column-title.radius { color: var(--radius-pending-color); }
+.pending-column-title.sessions i,
+.pending-column-title.sessions { color: var(--sessions-pending-color); }
+.pending-column-title.client i,
+.pending-column-title.client { color: var(--client-pending-color); }
+.pending-column-title.cco i,
+.pending-column-title.cco { color: var(--cco-pending-color); }
+
+.pending-badge {
+    background: #e9ecef;
+    color: #495057;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pending-badge.radius { background: rgba(255, 193, 7, 0.15); color: #856404; }
+.pending-badge.sessions { background: rgba(253, 126, 20, 0.15); color: #e8590c; }
+.pending-badge.client { background: rgba(32, 201, 151, 0.15); color: #0f5132; }
+.pending-badge.cco { background: rgba(13, 110, 253, 0.15); color: #084298; }
+
+.pending-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Modern Pending Card */
+.pending-item {
+    background: white;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    position: relative;
+}
+
+.pending-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.1);
+    border-color: transparent;
+}
+
+.pending-item.radius:hover { box-shadow: 0 12px 20px -8px rgba(255, 193, 7, 0.25); }
+.pending-item.sessions:hover { box-shadow: 0 12px 20px -8px rgba(253, 126, 20, 0.25); }
+.pending-item.client:hover { box-shadow: 0 12px 20px -8px rgba(32, 201, 151, 0.25); }
+.pending-item.cco:hover { box-shadow: 0 12px 20px -8px rgba(13, 110, 253, 0.25); }
+
+.pending-item-top {
+    padding: 16px 20px 12px;
+    background: #fefefe;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.pending-item-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.pending-item-code {
+    font-weight: 800;
+    font-size: 16px;
+    color: #1a202c;
+    letter-spacing: -0.2px;
+}
+
+.pending-item-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 30px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pending-item-badge.radius { background: rgba(255, 193, 7, 0.15); color: #856404; }
+.pending-item-badge.sessions { background: rgba(253, 126, 20, 0.15); color: #e8590c; }
+.pending-item-badge.client { background: rgba(32, 201, 151, 0.15); color: #0f5132; }
+.pending-item-badge.cco { background: rgba(13, 110, 253, 0.15); color: #084298; }
+
+.pending-item-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.pending-item-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pending-item-meta i {
+    width: 14px;
+    font-size: 12px;
+}
+
+.pending-item-body {
+    padding: 12px 20px;
+    background: #ffffff;
+}
+
+.pending-item-desc {
+    font-size: 13px;
+    color: #4a5568;
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.pending-item-footer {
+    padding: 12px 20px;
+    background: #fafbfc;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.pending-action-btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 18px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--primary-color), var(--sidebar-middle));
+    color: white;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.pending-action-btn:hover {
+    transform: translateX(3px);
+    filter: brightness(1.05);
+}
+
+.empty-pending {
+    text-align: center;
+    padding: 40px 20px;
+    background: #f8f9fa;
+    border-radius: 16px;
+}
+
+.empty-pending i {
+    font-size: 48px;
+    color: #cbd5e0;
+    margin-bottom: 15px;
+}
+
+.empty-pending p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+/* Client Approvals Icons */
+.client-approvals {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.client-approvals i {
+    font-size: 14px;
+}
+
+.badge-more {
+    background: #e2e8f0;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .pending-two-column {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .pending-section-wrapper {
+        padding: 15px;
+    }
+}
+</style>
+{% endblock %}
+
+<!-- Hide the page header completely -->
+{% block page_header %}{% endblock %}
+
+{% block content %}
+<div class="fade-in-up">
+    <!-- ========== WELCOME SECTION ========== -->
+    <div class="row g-0">
+        <div class="col-12">
+            <div class="welcome-card" style="margin: 0; padding: 25px 35px;">
+                <div class="welcome-content">
+                    <div class="welcome-text">
+                        <h2 class="welcome-title" style="font-size: 26px; margin-bottom: 5px;">
+                            <i class="fas fa-hand-peace me-2"></i>
+                            Welcome back, {{ request.user.get_full_name|default:request.user.username }}!
+                        </h2>
+                        <p class="welcome-subtitle" style="font-size: 13px; margin: 0;">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            {{ now|date:"l, F j, Y" }}
+                        </p>
+                    </div>
+                    <div class="welcome-stats">
+                        <div class="stat-badge" onclick="location.href='{% url 'letters:completed_list' %}'" style="padding: 6px 15px;">
+                            <i class="fas fa-chart-line"></i>
+                            <span>{{ completed_count }} Completed</span>
+                        </div>
+                        <div class="stat-badge" onclick="location.href='{% url 'letters:pending_approvals' %}'" style="padding: 6px 15px;">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ pending_radius|add:pending_sessions|add:pending_client|add:pending_cco }} Pending</span>
+                        </div>
+                        <div class="stat-badge" style="padding: 6px 15px;">
+                            <i class="fas fa-percent"></i>
+                            <span>
+                                {% with total=completed_count|add:pending_radius|add:pending_sessions|add:pending_client|add:pending_cco %}
+                                    {% if total > 0 %}
+                                        {% widthratio completed_count total 100 %}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                {% endwith %} Complete
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="welcome-decoration">
+                    <div class="decoration-circle" style="width: 100px; height: 100px; top: -30px; right: -20px;"></div>
+                    <div class="decoration-circle delay-1" style="width: 70px; height: 70px; bottom: -20px; left: 15%;"></div>
+                    <div class="decoration-circle delay-2" style="width: 50px; height: 50px; top: 30%; right: 5%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== OVERVIEW SECTION HEADER ========== -->
+    <div class="row mb-3 mt-4">
+        <div class="col-12">
+            <div class="section-header">
+                <h5 class="section-title">
+                    <i class="fas fa-chart-line me-2"></i>Overview
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PENDING APPROVALS SUMMARY CARDS ========== -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="stat-grid">
+                <div class="stat-mini-card" onclick="location.href='{% url 'letters:pending_approvals' %}?tab=radius'">
+                    <div class="stat-mini-icon radius">
+                        <i class="fas fa-wifi fa-2x"></i>
+                    </div>
+                    <div class="stat-mini-info">
+                        <h4>{{ pending_radius|default:0 }}</h4>
+                        <p>Radius Pending</p>
+                    </div>
+                </div>
+                <div class="stat-mini-card" onclick="location.href='{% url 'letters:pending_approvals' %}?tab=sessions'">
+                    <div class="stat-mini-icon sessions">
+                        <i class="fas fa-chalkboard-user fa-2x"></i>
+                    </div>
+                    <div class="stat-mini-info">
+                        <h4>{{ pending_sessions|default:0 }}</h4>
+                        <p>Sessions Pending</p>
+                    </div>
+                </div>
+                <div class="stat-mini-card" onclick="location.href='{% url 'letters:pending_approvals' %}?tab=client'">
+                    <div class="stat-mini-icon client">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                    <div class="stat-mini-info">
+                        <h4>{{ pending_client|default:0 }}</h4>
+                        <p>Client Pending</p>
+                    </div>
+                </div>
+                <div class="stat-mini-card" onclick="location.href='{% url 'letters:pending_approvals' %}?tab=cco'">
+                    <div class="stat-mini-icon cco">
+                        <i class="fas fa-crown fa-2x"></i>
+                    </div>
+                    <div class="stat-mini-info">
+                        <h4>{{ pending_cco|default:0 }}</h4>
+                        <p>CCO Review</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== QUICK ACTIONS ========== -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="section-header mb-3">
+                <h5 class="section-title">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="row">
+                <div class="col-md-3 col-sm-6">
+                    <div class="quick-action-card" onclick="location.href='{% url 'letters:create_facs' %}'">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="quick-action-title">New FACS Letter</div>
+                        <div class="quick-action-desc">Create a new FACS letter</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="quick-action-card" onclick="location.href='{% url 'letters:create_artiva' %}'">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-file-signature"></i>
+                        </div>
+                        <div class="quick-action-title">New Artiva Letter</div>
+                        <div class="quick-action-desc">Create a new Artiva letter</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="quick-action-card" onclick="location.href='{% url 'letters:pending_approvals' %}'">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="quick-action-title">Review Approvals</div>
+                        <div class="quick-action-desc">Review pending approvals</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="quick-action-card" onclick="location.href='{% url 'letters:reports' %}'">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="quick-action-title">View Reports</div>
+                        <div class="quick-action-desc">Analytics & reports</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== STATS CARDS ========== -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card stats-card-primary" onclick="location.href='{% url 'letters:list' %}'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ total_facs|add:total_artiva }}</h3>
+                    <p class="stats-label">Total Letters</p>
+                    <span class="stats-trend">All Systems</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card stats-card-warning" onclick="location.href='{% url 'letters:pending_approvals' %}'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ pending_radius|add:pending_sessions|add:pending_client|add:pending_cco }}</h3>
+                    <p class="stats-label">Pending Approvals</p>
+                    <span class="stats-trend">Awaiting Action</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card stats-card-info" onclick="location.href='{% url 'letters:radius_pending' %}'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-wifi"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ pending_radius }}</h3>
+                    <p class="stats-label">Radius Pending</p>
+                    <span class="stats-trend">Internal Review</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card stats-card-success" onclick="location.href='{% url 'letters:completed_list' %}'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ completed_count }}</h3>
+                    <p class="stats-label">Completed</p>
+                    <span class="stats-trend">Successfully Processed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CHARTS ROW ========== -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5 class="chart-card-title">
+                        <i class="fas fa-chart-pie me-2"></i>Letters by Status
+                    </h5>
+                </div>
+                <div class="chart-card-body">
+                    <canvas id="statusChart" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5 class="chart-card-title">
+                        <i class="fas fa-chart-line me-2"></i>Monthly Trend
+                    </h5>
+                </div>
+                <div class="chart-card-body">
+                    <canvas id="trendChart" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PENDING APPROVALS DETAIL SECTION (IMPROVED) ========== -->
+    <div class="pending-section-wrapper">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="section-header">
+                    <h5 class="section-title">
+                        <i class="fas fa-bell me-2"></i>Pending Approvals Detail
+                        <span class="pending-badge" style="background: #e9ecef; color: #495057;">
+                            {{ radius_pending_list|length|add:sessions_pending_list|length|add:client_pending_list|length|add:cco_pending_list|length }} Total
+                        </span>
+                    </h5>
+                    <a href="{% url 'letters:pending_approvals' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-external-link-alt me-1"></i>View All
+                    </a>
+                </div>
+                <p class="text-muted small mb-0">Review and take action on pending approval requests</p>
+            </div>
+        </div>
+
+        <div class="pending-two-column">
+            <!-- LEFT COLUMN: RADIUS & SESSIONS PENDING -->
+            <div class="pending-column">
+                <!-- Radius Pending Sub-section -->
+                <div class="pending-column-header radius">
+                    <div class="pending-column-title radius">
+                        <i class="fas fa-wifi"></i> Radius Pending
+                    </div>
+                    <span class="pending-badge radius">{{ radius_pending_list|length }}</span>
+                </div>
+                <div class="pending-grid">
+                    {% if radius_pending_list %}
+                        {% for item in radius_pending_list|slice:":4" %}
+                        <div class="pending-item radius">
+                            <div class="pending-item-top">
+                                <div class="pending-item-title">
+                                    <span class="pending-item-code">{{ item.letter.letter_code }}</span>
+                                    <span class="pending-item-badge radius">Radius</span>
+                                </div>
+                                <div class="pending-item-meta">
+                                    <span><i class="fas fa-user"></i> {{ item.letter.created_by.username }}</span>
+                                    <span><i class="fas fa-calendar"></i> {{ item.letter.created_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="pending-item-body">
+                                <p class="pending-item-desc">{{ item.letter.letter_description|truncatechars:100|default:"No description provided." }}</p>
+                            </div>
+                            <div class="pending-item-footer">
+                                <a href="{% url 'letters:radius_approve' item.approval.id %}" class="pending-action-btn">
+                                    Review <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-pending">
+                            <i class="fas fa-check-circle"></i>
+                            <p>No Radius pending approvals</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sessions Pending Sub-section -->
+                <div class="pending-column-header sessions mt-4">
+                    <div class="pending-column-title sessions">
+                        <i class="fas fa-chalkboard-user"></i> Sessions Pending
+                    </div>
+                    <span class="pending-badge sessions">{{ sessions_pending_list|length }}</span>
+                </div>
+                <div class="pending-grid">
+                    {% if sessions_pending_list %}
+                        {% for item in sessions_pending_list|slice:":4" %}
+                        <div class="pending-item sessions">
+                            <div class="pending-item-top">
+                                <div class="pending-item-title">
+                                    <span class="pending-item-code">{{ item.letter.letter_code }}</span>
+                                    <span class="pending-item-badge sessions">Sessions</span>
+                                </div>
+                                <div class="pending-item-meta">
+                                    <span><i class="fas fa-user"></i> {{ item.letter.created_by.username }}</span>
+                                    <span><i class="fas fa-calendar"></i> {{ item.letter.created_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="pending-item-body">
+                                <p class="pending-item-desc">{{ item.letter.letter_description|truncatechars:100|default:"No description provided." }}</p>
+                            </div>
+                            <div class="pending-item-footer">
+                                <a href="{% url 'letters:sessions_approve' item.approval.id %}" class="pending-action-btn">
+                                    Review <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-pending">
+                            <i class="fas fa-check-circle"></i>
+                            <p>No Sessions pending approvals</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if radius_pending_list|length > 4 or sessions_pending_list|length > 4 %}
+                <div class="text-center mt-3">
+                    <a href="{% url 'letters:pending_approvals' %}?tab=radius" class="btn btn-sm btn-outline-primary">
+                        View All Radius & Sessions <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- RIGHT COLUMN: CLIENT & CCO PENDING -->
+            <div class="pending-column">
+                <!-- Client Pending Sub-section -->
+                <div class="pending-column-header client">
+                    <div class="pending-column-title client">
+                        <i class="fas fa-users"></i> Client Pending
+                    </div>
+                    <span class="pending-badge client">{{ client_pending_list|length }}</span>
+                </div>
+                <div class="pending-grid">
+                    {% if client_pending_list %}
+                        {% for letter in client_pending_list|slice:":4" %}
+                        <div class="pending-item client">
+                            <div class="pending-item-top">
+                                <div class="pending-item-title">
+                                    <span class="pending-item-code">{{ letter.letter_code }}</span>
+                                    <span class="pending-item-badge client">Client</span>
+                                </div>
+                                <div class="pending-item-meta">
+                                    <span><i class="fas fa-user"></i> {{ letter.created_by.username }}</span>
+                                    <span><i class="fas fa-calendar"></i> {{ letter.created_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="pending-item-body">
+                                <p class="pending-item-desc">{{ letter.letter_description|truncatechars:100|default:"No description provided." }}</p>
+                            </div>
+                            <div class="pending-item-footer">
+                                <a href="{% url 'letters:client_approve' letter.id %}" class="pending-action-btn">
+                                    Review <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-pending">
+                            <i class="fas fa-check-circle"></i>
+                            <p>No Client pending approvals</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- CCO Pending Sub-section -->
+                <div class="pending-column-header cco mt-4">
+                    <div class="pending-column-title cco">
+                        <i class="fas fa-crown"></i> CCO Review
+                    </div>
+                    <span class="pending-badge cco">{{ cco_pending_list|length }}</span>
+                </div>
+                <div class="pending-grid">
+                    {% if cco_pending_list %}
+                        {% for letter in cco_pending_list|slice:":4" %}
+                        <div class="pending-item cco">
+                            <div class="pending-item-top">
+                                <div class="pending-item-title">
+                                    <span class="pending-item-code">{{ letter.letter_code }}</span>
+                                    <span class="pending-item-badge cco">CCO</span>
+                                </div>
+                                <div class="pending-item-meta">
+                                    <span><i class="fas fa-user"></i> {{ letter.created_by.username }}</span>
+                                    <span><i class="fas fa-calendar"></i> {{ letter.created_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="pending-item-body">
+                                <p class="pending-item-desc">{{ letter.letter_description|truncatechars:100|default:"No description provided." }}</p>
+                            </div>
+                            <div class="pending-item-footer">
+                                <a href="{% url 'letters:cco_final_approve' letter.id %}" class="pending-action-btn">
+                                    Review <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-pending">
+                            <i class="fas fa-check-circle"></i>
+                            <p>No CCO pending reviews</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if client_pending_list|length > 4 or cco_pending_list|length > 4 %}
+                <div class="text-center mt-3">
+                    <a href="{% url 'letters:pending_approvals' %}?tab=client" class="btn btn-sm btn-outline-primary">
+                        View All Client & CCO <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== RECENT LETTERS TABLE ========== -->
+    <div class="data-card">
+        <div class="data-card-header">
+            <h5 class="data-card-title">
+                <i class="fas fa-history me-2"></i>Recent Letters
+            </h5>
+        </div>
+        <div class="data-card-body">
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th>Letter Code</th>
+                            <th>System</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for letter in recent_facs|slice:":5" %}
+                        <tr>
+                            <td><strong>{{ letter.letter_code }}</strong></td>
+                            <td><span class="system-badge system-facs">FACS</span></td>
+                            <td>{{ letter.document_description|truncatechars:50 }}</td>
+                            <td>
+                                <span class="status-indicator status-{{ letter.status|lower }}">
+                                    {{ letter.get_status_display }}
+                                </span>
+                            </span>
+                            <td>{{ letter.created_at|date:"M d, Y" }}</span>
+                            <td>
+                                <a href="{% url 'letters:facs_detail' letter.id %}" class="btn-action">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </span>
+                        </span>
+                        {% endfor %}
+                        {% for letter in recent_artiva|slice:":5" %}
+                        <tr>
+                            <td><strong>{{ letter.letter_code }}</strong></span>
+                            <td><span class="system-badge system-artiva">Artiva</span></span>
+                            <td>{{ letter.document_description|truncatechars:50 }}</span>
+                            <td>
+                                <span class="status-indicator status-{{ letter.status|lower }}">
+                                    {{ letter.get_status_display }}
+                                </span>
+                            </span>
+                            <td>{{ letter.created_at|date:"M d, Y" }}</span>
+                            <td>
+                                <a href="{% url 'letters:artiva_detail' letter.id %}" class="btn-action">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </span>
+                        </span>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <i class="fas fa-inbox fa-2x text-muted mb-2 d-block"></i>
+                                No letters found
+                            </span>
+                        </span>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== FACS SYSTEM SECTION ========== -->
+    <div class="row mt-5 mb-4">
+        <div class="col-12">
+            <div class="section-header">
+                <h5 class="section-title">
+                    <i class="fas fa-file-alt me-2"></i>FACS System
+                    <span class="system-badge system-facs ms-2">FACS</span>
+                </h5>
+                <a href="{% url 'letters:create_facs' %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>New FACS Letter
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FACS Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card stats-card-primary" onclick="location.href='{% url 'letters:list' %}?system=FACS'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ total_facs }}</h3>
+                    <p class="stats-label">Total FACS</p>
+                    <span class="stats-trend">All FACS Letters</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card stats-card-warning" onclick="location.href='{% url 'letters:pending_approvals' %}?tab=client'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ pending_client|default:0 }}</h3>
+                    <p class="stats-label">Client Pending</p>
+                    <span class="stats-trend">Awaiting Client Approval</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card stats-card-info" onclick="location.href='{% url 'letters:pending_approvals' %}?tab=radius'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-wifi"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ radius_pending_facs|default:0 }}</h3>
+                    <p class="stats-label">In Review</p>
+                    <span class="stats-trend">Radius/Sessions Pending</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card stats-card-success" onclick="location.href='{% url 'letters:completed_list' %}?system=FACS'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ completed_facs|default:0 }}</h3>
+                    <p class="stats-label">Completed</p>
+                    <span class="stats-trend">Successfully Processed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent FACS Letters -->
+    <div class="data-card mb-5">
+        <div class="data-card-header">
+            <h5 class="data-card-title">
+                <i class="fas fa-history me-2"></i>Recent FACS Letters
+            </h5>
+        </div>
+        <div class="data-card-body">
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th>Letter Code</th>
+                            <th>Description</th>
+                            <th>Client Approvals</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for letter in recent_facs|slice:":5" %}
+                        <tr>
+                            <td><strong>{{ letter.letter_code }}</strong></td>
+                            <td>{{ letter.document_description|truncatechars:40 }}</td>
+                            <td>
+                                {% with approvals=letter.get_client_approval_matrix %}
+                                    <div class="client-approvals">
+                                        {% for client, data in approvals.items|slice:":3" %}
+                                            {% if data.status == 'Approved' %}
+                                                <i class="fas fa-check-circle text-success" title="{{ client }}"></i>
+                                            {% else %}
+                                                <i class="fas fa-clock text-warning" title="{{ client }}"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if approvals|length > 3 %}
+                                            <span class="badge-more">+{{ approvals|length|add:"-3" }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% endwith %}
+                            </td>
+                            <td>
+                                <span class="status-indicator status-{{ letter.status|lower }}">
+                                    {{ letter.get_status_display }}
+                                </span>
+                            </span>
+                            <td>{{ letter.created_at|date:"M d, Y" }}</span>
+                            <td>
+                                <a href="{% url 'letters:facs_detail' letter.id %}" class="btn-action">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </span>
+                        </span>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                No FACS letters found
+                            </span>
+                        </span>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ARTIVA SYSTEM SECTION ========== -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="section-header">
+                <h5 class="section-title">
+                    <i class="fas fa-file-signature me-2"></i>Artiva System
+                    <span class="system-badge system-artiva ms-2">Artiva</span>
+                </h5>
+                <a href="{% url 'letters:create_artiva' %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>New Artiva Letter
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Artiva Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card stats-card-success" onclick="location.href='{% url 'letters:list' %}?system=ARTIVA'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ total_artiva }}</h3>
+                    <p class="stats-label">Total Artiva</p>
+                    <span class="stats-trend">All Artiva Letters</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card stats-card-warning" onclick="location.href='{% url 'letters:pending_approvals' %}?tab=radius'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ pending_sessions|default:0 }}</h3>
+                    <p class="stats-label">Pending Approvals</p>
+                    <span class="stats-trend">Awaiting Review</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card stats-card-info" onclick="location.href='{% url 'letters:pending_approvals' %}?tab=cco'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-spinner"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ cco_pending_artiva|default:0 }}</h3>
+                    <p class="stats-label">CCO Review</p>
+                    <span class="stats-trend">Final Approval</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card stats-card-success" onclick="location.href='{% url 'letters:completed_list' %}?system=ARTIVA'">
+                <div class="stats-card-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ completed_artiva|default:0 }}</h3>
+                    <p class="stats-label">Completed</p>
+                    <span class="stats-trend">Successfully Processed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Artiva Letters -->
+    <div class="data-card">
+        <div class="data-card-header">
+            <h5 class="data-card-title">
+                <i class="fas fa-history me-2"></i>Recent Artiva Letters
+            </h5>
+        </div>
+        <div class="data-card-body">
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th>Letter Code</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for letter in recent_artiva|slice:":5" %}
+                        <tr>
+                            <td><strong>{{ letter.letter_code }}</strong></td>
+                            <td>{{ letter.document_description|truncatechars:40 }}</span>
+                            <td>
+                                <span class="status-indicator status-{{ letter.status|lower }}">
+                                    {{ letter.get_status_display }}
+                                </span>
+                            </span>
+                            <td>{{ letter.created_at|date:"M d, Y" }}</span>
+                            <td>
+                                <a href="{% url 'letters:artiva_detail' letter.id %}" class="btn-action">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </span>
+                        </span>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                No Artiva letters found
+                            </span>
+                        </span>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Status Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Draft', 'Radius Pending', 'Sessions Pending', 'Client Pending', 'CCO Review', 'Completed'],
+            datasets: [{
+                data: [
+                    {{ draft_count|default:0 }},
+                    {{ pending_radius|default:0 }},
+                    {{ pending_sessions|default:0 }},
+                    {{ pending_client|default:0 }},
+                    {{ pending_cco|default:0 }},
+                    {{ completed_count|default:0 }}
+                ],
+                backgroundColor: [
+                    '#6c757d',
+                    '#ffc107',
+                    '#fd7e14',
+                    '#20c997',
+                    '#0d6efd',
+                    '#198754'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
+    });
+
+    // Trend Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ monthly_labels|default:'[]'|safe }},
+            datasets: [
+                {
+                    label: 'FACS',
+                    data: {{ facs_trend|default:'[]'|safe }},
+                    borderColor: '#4361ee',
+                    backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#4361ee',
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Artiva',
+                    data: {{ artiva_trend|default:'[]'|safe }},
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: { size: 12 }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#e2e8f0'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

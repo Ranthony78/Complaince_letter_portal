@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Letters - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<style>
+.letters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.filter-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.filter-title {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.table-container {
+    background: white;
+    border-radius: 20px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border-radius: 12px;
+    border: 2px solid var(--gray-light);
+    padding: 8px 16px;
+    margin-left: 8px;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border-radius: 12px;
+    border: 2px solid var(--gray-light);
+    padding: 8px;
+}
+
+.badge-system {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-facs {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.badge-artiva {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.status-indicator {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-draft {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.status-radius_pending, .status-sessions_pending, .status-client_pending, .status-cco_review {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-completed {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.btn-action {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--light-color);
+    color: var(--gray-color);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-action:hover {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    color: white;
+    transform: scale(1.05);
+}
+
+.pagination-container {
+    margin-top: 24px;
+}
+
+.pagination .page-link {
+    border-radius: 10px;
+    margin: 0 4px;
+    color: var(--dark-color);
+    border: 1px solid var(--gray-light);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Stats Cards */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--primary-color);
+}
+
+.stat-info h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark-color);
+}
+
+.stat-info p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gray-color);
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .filter-card .row {
+        flex-direction: column;
+    }
+
+    .filter-card .col-md-3,
+    .filter-card .col-md-2,
+    .filter-card .col-md-1 {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block page_title %}All Letters{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'letters:create_facs' %}" class="btn btn-primary me-2">
+    <i class="fas fa-file-alt me-2"></i>FACS Letter
+</a>
+<a href="{% url 'letters:create_artiva' %}" class="btn btn-success">
+    <i class="fas fa-file-signature me-2"></i>Artiva Letter
+</a>
+{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item">
+    <a href="{% url 'dashboard:index' %}" class="text-decoration-none">
+        <i class="fas fa-home me-1"></i>Dashboard
+    </a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+    <i class="fas fa-envelope me-1"></i>All Letters
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="fade-in-up">
+    <!-- Stats Summary Cards -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_letters|default:letters|length }}</h3>
+                <p>Total Letters</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ completed_count|default:0 }}</h3>
+                <p>Completed</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ pending_count|default:0 }}</h3>
+                <p>Pending</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-pencil-alt"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ draft_count|default:0 }}</h3>
+                <p>Drafts</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-card">
+        <div class="filter-title">
+            <i class="fas fa-filter"></i> Filter Letters
+        </div>
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control" placeholder="Search by code or description" value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-2">
+                <select name="system" class="form-select">
+                    <option value="">All Systems</option>
+                    <option value="FACS" {% if request.GET.system == 'FACS' %}selected{% endif %}>FACS</option>
+                    <option value="ARTIVA" {% if request.GET.system == 'ARTIVA' %}selected{% endif %}>Artiva</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="Draft" {% if request.GET.status == 'Draft' %}selected{% endif %}>Draft</option>
+                    <option value="Radius_Pending" {% if request.GET.status == 'Radius_Pending' %}selected{% endif %}>Radius Pending</option>
+                    <option value="Sessions_Pending" {% if request.GET.status == 'Sessions_Pending' %}selected{% endif %}>Sessions Pending</option>
+                    <option value="Client_Pending" {% if request.GET.status == 'Client_Pending' %}selected{% endif %}>Client Pending</option>
+                    <option value="CCO_Review" {% if request.GET.status == 'CCO_Review' %}selected{% endif %}>CCO Review</option>
+                    <option value="Completed" {% if request.GET.status == 'Completed' %}selected{% endif %}>Completed</option>
+                    <option value="Rejected" {% if request.GET.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_from" class="form-control" placeholder="Date From" value="{{ request.GET.date_from }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="date_to" class="form-control" placeholder="Date To" value="{{ request.GET.date_to }}">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+        <!-- Reset Filter Button -->
+        <div class="filter-buttons">
+            <a href="{% url 'letters:list' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-undo me-1"></i>Reset Filters
+            </a>
+        </div>
+    </div>
+
+    <!-- Letters Table -->
+    <div class="table-container">
+        <table class="table table-hover mb-0" id="lettersTable">
+            <thead>
+                <tr>
+                    <th>Letter Code</th>
+                    <th>System</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Created By</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for letter in letters %}
+                <tr>
+                    <td>
+                        <strong>{{ letter.letter_code }}</strong>
+                        {% if letter.current_version != 'V.1' %}
+                        <br><small class="text-muted">v{{ letter.current_version }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge-system {% if letter.system_type == 'FACS' %}badge-facs{% else %}badge-artiva{% endif %}">
+                            {{ letter.system_type }}
+                        </span>
+                    </td>
+                    <td>{{ letter.document_description|default:letter.letter_description|truncatechars:60|default:"-" }}</td>
+                    <td>
+                        <span class="status-indicator status-{{ letter.status|lower }}">
+                            {{ letter.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ letter.created_by.get_full_name|default:letter.created_by.username }}</td>
+                    <td>{{ letter.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <!-- View Button - conditional based on letter type -->
+                            {% if letter.system_type == 'FACS' %}
+                            <a href="{% url 'letters:facs_detail' letter.id %}" class="btn-action" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% else %}
+                            <a href="{% url 'letters:artiva_detail' letter.id %}" class="btn-action" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% endif %}
+
+                            <!-- Edit Button - only for Draft status and creator -->
+                            {% if letter.status == 'Draft' and letter.created_by == request.user %}
+                                {% if letter.system_type == 'FACS' %}
+                                <a href="{% url 'letters:edit_facs' letter.id %}" class="btn-action" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% else %}
+                                <a href="{% url 'letters:edit_artiva' letter.id %}" class="btn-action" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% endif %}
+                            {% endif %}
+
+                            <!-- Manage Approvals Button - only for CCO -->
+                            {% if request.user.role == 'CCO' and letter.status != 'Completed' %}
+                            <a href="{% url 'letters:cco_approval_management' letter.id %}" class="btn-action" title="Manage Approvals">
+                                <i class="fas fa-check-double"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">No letters found</p>
+                        <a href="{% url 'letters:create_facs' %}" class="btn btn-primary mt-3">Create Your First Letter</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination-container">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#lettersTable').DataTable({
+        responsive: true,
+        pageLength: 25,
+        ordering: true,
+        searching: false,
+        paging: false,
+        info: false,
+        columnDefs: [
+            { orderable: false, targets: -1 }
+        ]
+    });
+});
+</script>
+{% endblock %}

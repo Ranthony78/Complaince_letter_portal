@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pending Approvals - Letter Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.approval-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+}
+
+.approval-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.approval-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.approval-title {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.approval-details {
+    margin-bottom: 15px;
+}
+
+.approval-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--gray-color);
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.empty-icon i {
+    font-size: 40px;
+    color: var(--primary-color);
+}
+
+.badge-pending {
+    background: #fff3cd;
+    color: #856404;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-facs {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-artiva {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.tab-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--gray-light);
+    flex-wrap: wrap;
+}
+
+.tab-link {
+    padding: 10px 20px;
+    color: var(--gray-color);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-link.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-link:hover {
+    color: var(--primary-color);
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+</style>
+{% endblock %}
+
+{% block page_title %}Pending Approvals{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item">
+    <a href="{% url 'dashboard:index' %}" class="text-decoration-none">
+        <i class="fas fa-home me-1"></i>Dashboard
+    </a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">
+    <i class="fas fa-clock me-1"></i>Pending Approvals
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="fade-in-up">
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+        {% if radius_pending %}
+        <a href="#radius" class="tab-link {% if not request.GET.tab or request.GET.tab == 'radius' %}active{% endif %}" data-tab="radius">
+            Radius Approvals ({{ radius_pending|length }})
+        </a>
+        {% endif %}
+        {% if sessions_pending %}
+        <a href="#sessions" class="tab-link {% if request.GET.tab == 'sessions' %}active{% endif %}" data-tab="sessions">
+            Sessions Approvals ({{ sessions_pending|length }})
+        </a>
+        {% endif %}
+        {% if client_pending %}
+        <a href="#client" class="tab-link {% if request.GET.tab == 'client' %}active{% endif %}" data-tab="client">
+            Client Approvals ({{ client_pending|length }})
+        </a>
+        {% endif %}
+        {% if cco_pending %}
+        <a href="#cco" class="tab-link {% if request.GET.tab == 'cco' %}active{% endif %}" data-tab="cco">
+            CCO Review ({{ cco_pending|length }})
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Radius Pending Tab -->
+    {% if radius_pending %}
+    <div id="radius-tab" class="tab-pane active">
+        {% for item in radius_pending %}
+        <div class="approval-card">
+            <div class="approval-header">
+                <div class="approval-title">
+                    <strong>{{ item.letter.letter_code }}</strong>
+                    <span class="badge-facs ms-2">{{ item.letter.system_type }}</span>
+                </div>
+                <span class="badge-pending">Pending Radius Approval</span>
+            </div>
+            <div class="approval-details">
+                <div class="approval-meta">
+                    <span><i class="fas fa-user me-1"></i>Created by: {{ item.letter.created_by.get_full_name|default:item.letter.created_by.username }}</span>
+                    <span><i class="far fa-calendar me-1"></i>{{ item.letter.created_at|date:"M d, Y" }}</span>
+                </div>
+                <p class="text-muted small">{{ item.letter.letter_description|truncatechars:150 }}</p>
+            </div>
+            <div class="d-flex gap-2">
+                <!-- FIX: Check if approval has valid id before generating URL -->
+                {% if item.approval and item.approval.id %}
+                <a href="{% url 'letters:radius_approve' item.approval.id %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-check-circle me-1"></i>Review & Approve
+                </a>
+                {% endif %}
+                <a href="{% if item.letter.system_type == 'FACS' %}{% url 'letters:facs_detail' item.letter.id %}{% else %}{% url 'letters:artiva_detail' item.letter.id %}{% endif %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-eye me-1"></i>View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Sessions Pending Tab -->
+    {% if sessions_pending %}
+    <div id="sessions-tab" class="tab-pane {% if not radius_pending %}active{% endif %}">
+        {% for item in sessions_pending %}
+        <div class="approval-card">
+            <div class="approval-header">
+                <div class="approval-title">
+                    <strong>{{ item.letter.letter_code }}</strong>
+                    <span class="badge-{% if item.letter.system_type == 'FACS' %}facs{% else %}artiva{% endif %} ms-2">{{ item.letter.system_type }}</span>
+                </div>
+                <span class="badge-pending">Pending Sessions Approval</span>
+            </div>
+            <div class="approval-details">
+                <div class="approval-meta">
+                    <span><i class="fas fa-user me-1"></i>Created by: {{ item.letter.created_by.get_full_name|default:item.letter.created_by.username }}</span>
+                    <span><i class="far fa-calendar me-1"></i>{{ item.letter.created_at|date:"M d, Y" }}</span>
+                </div>
+                <p class="text-muted small">{{ item.letter.letter_description|truncatechars:150 }}</p>
+            </div>
+            <div class="d-flex gap-2">
+                <!-- FIX: Check if approval has valid id before generating URL -->
+                {% if item.approval and item.approval.id %}
+                <a href="{% url 'letters:sessions_approve' item.approval.id %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-check-circle me-1"></i>Review & Approve
+                </a>
+                {% endif %}
+                <a href="{% if item.letter.system_type == 'FACS' %}{% url 'letters:facs_detail' item.letter.id %}{% else %}{% url 'letters:artiva_detail' item.letter.id %}{% endif %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-eye me-1"></i>View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Client Pending Tab -->
+    {% if client_pending %}
+    <div id="client-tab" class="tab-pane">
+        {% for letter in client_pending %}
+        <div class="approval-card">
+            <div class="approval-header">
+                <div class="approval-title">
+                    <strong>{{ letter.letter_code }}</strong>
+                    <span class="badge-facs ms-2">FACS</span>
+                </div>
+                <span class="badge-pending">Pending Client Approval</span>
+            </div>
+            <div class="approval-details">
+                <div class="approval-meta">
+                    <span><i class="fas fa-user me-1"></i>Created by: {{ letter.created_by.get_full_name|default:letter.created_by.username }}</span>
+                    <span><i class="far fa-calendar me-1"></i>{{ letter.created_at|date:"M d, Y" }}</span>
+                </div>
+                <p class="text-muted small">{{ letter.letter_description|truncatechars:150 }}</p>
+            </div>
+            <div class="d-flex gap-2">
+                <!-- Use your existing URL -->
+                <a href="{% url 'letters:client_approve' letter.id %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-check-circle me-1"></i>Review & Approve Client
+                </a>
+                <a href="{% url 'letters:facs_detail' letter.id %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-eye me-1"></i>View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- CCO Pending Tab -->
+    {% if cco_pending %}
+    <div id="cco-tab" class="tab-pane">
+        {% for letter in cco_pending %}
+        <div class="approval-card">
+            <div class="approval-header">
+                <div class="approval-title">
+                    <strong>{{ letter.letter_code }}</strong>
+                    <span class="badge-{% if letter.system_type == 'FACS' %}facs{% else %}artiva{% endif %} ms-2">{{ letter.system_type }}</span>
+                </div>
+                <span class="badge-pending">Pending CCO Review</span>
+            </div>
+            <div class="approval-details">
+                <div class="approval-meta">
+                    <span><i class="fas fa-user me-1"></i>Created by: {{ letter.created_by.get_full_name|default:letter.created_by.username }}</span>
+                    <span><i class="far fa-calendar me-1"></i>{{ letter.created_at|date:"M d, Y" }}</span>
+                </div>
+                <p class="text-muted small">{{ letter.letter_description|truncatechars:150 }}</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'letters:cco_final_approve' letter.id %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-check-circle me-1"></i>Review & Final Approve
+                </a>
+                <a href="{% if letter.system_type == 'FACS' %}{% url 'letters:facs_detail' letter.id %}{% else %}{% url 'letters:artiva_detail' letter.id %}{% endif %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-eye me-1"></i>View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- No Pending Approvals -->
+    {% if not radius_pending and not sessions_pending and not client_pending and not cco_pending %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h4>No Pending Approvals</h4>
+        <p>All caught up! There are no letters waiting for your approval.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Tab switching functionality with URL parameter support
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the tab parameter from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab');
+
+    // Define tab mappings
+    const tabMappings = {
+        'radius': 'radius-tab',
+        'sessions': 'sessions-tab',
+        'client': 'client-tab',
+        'cco': 'cco-tab'
+    };
+
+    // If a tab parameter exists, activate that tab
+    if (activeTab && tabMappings[activeTab]) {
+        const targetTabId = tabMappings[activeTab];
+
+        // Remove active class from all tabs and panes
+        document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+        // Find and activate the correct tab link
+        const targetLink = document.querySelector(`.tab-link[data-tab="${activeTab}"]`);
+        if (targetLink) {
+            targetLink.classList.add('active');
+        }
+
+        // Activate the correct pane
+        const targetPane = document.getElementById(targetTabId);
+        if (targetPane) {
+            targetPane.classList.add('active');
+        }
+    }
+
+    // Tab switching functionality
+    document.querySelectorAll('.tab-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tabId = this.dataset.tab;
+
+            // Remove active class from all tabs and panes
+            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+            // Add active class to current tab and pane
+            this.classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+
+            // Update URL without reloading (optional)
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', tabId);
+            window.history.pushState({}, '', url);
+        });
+    });
+});
+</script>
+{% endblock %}

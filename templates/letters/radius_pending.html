@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Radius Pending Approvals - Letter Portal{% endblock %}
+
+{% block page_title %}Radius Pending Approvals{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Home</a></li>
+<li class="breadcrumb-item"><a href="{% url 'letters:pending_approvals' %}">Pending Approvals</a></li>
+<li class="breadcrumb-item active">Radius Approvals</li>
+{% endblock %}
+
+{% block content %}
+<div class="fade-in-up">
+    <!-- Stats Summary -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stats-card stats-card-info">
+                <div class="stats-card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ pending_approvals|length }}</h3>
+                    <p class="stats-label">Pending Approvals</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card stats-card-primary">
+                <div class="stats-card-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ total_approved|default:0 }}</h3>
+                    <p class="stats-label">Approved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card stats-card-success">
+                <div class="stats-card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stats-card-content">
+                    <h3 class="stats-number">{{ completion_rate|default:0 }}%</h3>
+                    <p class="stats-label">Completion Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Approvals List -->
+    {% if pending_approvals %}
+        {% for approval in pending_approvals %}
+        <div class="pending-card">
+            <div class="pending-header">
+                <div class="pending-code">
+                    <i class="fas fa-radar"></i>
+                    {{ approval.letter.letter_code }}
+                </div>
+                <span class="badge-system {% if approval.letter.system_type == 'FACS' %}badge-facs{% else %}badge-artiva{% endif %}">
+                    {{ approval.letter.system_type }}
+                </span>
+            </div>
+            <div class="pending-details">
+                <div class="pending-info">
+                    <span><i class="fas fa-user me-1"></i> Created by: {{ approval.letter.created_by.get_full_name|default:approval.letter.created_by.username }}</span>
+                    <!-- FIXED: Safe date handling without timesince -->
+                    <span><i class="fas fa-clock me-1"></i>
+                        {% if approval.letter.submitted_at %}
+                            Submitted: {{ approval.letter.submitted_at|date:"M d, Y H:i" }}
+                        {% elif approval.created_at %}
+                            Created: {{ approval.created_at|date:"M d, Y H:i" }}
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </span>
+                    <span><i class="fas fa-tag me-1"></i> {{ approval.letter.get_timing_display|default:"Timing not set" }}</span>
+                </div>
+                <div class="pending-description mt-2">
+                    <strong>Description:</strong> {{ approval.letter.document_description|default:approval.letter.letter_description|truncatechars:150|default:"No description provided." }}
+                </div>
+                {% if approval.comments %}
+                <div class="pending-comments mt-2">
+                    <strong><i class="fas fa-comment me-1"></i> Previous Comments:</strong>
+                    <p class="small text-muted mt-1">{{ approval.comments }}</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="pending-actions">
+                <a href="{% url 'letters:radius_approve' approval.id %}" class="btn btn-primary">
+                    <i class="fas fa-check-circle me-2"></i>Review & Approve
+                </a>
+                <button onclick="rejectApproval({{ approval.id }})" class="btn btn-outline-danger">
+                    <i class="fas fa-times-circle me-2"></i>Reject
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state text-center py-5">
+            <div class="empty-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h4>No Pending Radius Approvals</h4>
+            <p class="text-muted">All caught up! No radius approvals pending at the moment.</p>
+            <a href="{% url 'dashboard:index' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-home me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.pending-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+}
+
+.pending-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.pending-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pending-code {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.pending-code i {
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+.pending-info {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--gray-color);
+    flex-wrap: wrap;
+}
+
+.pending-description {
+    color: var(--gray-color);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.pending-comments {
+    background: var(--light-color);
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+.pending-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    justify-content: flex-end;
+}
+
+.empty-state {
+    background: white;
+    border-radius: 24px;
+    padding: 60px;
+    text-align: center;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.empty-icon i {
+    font-size: 40px;
+    color: var(--success-color);
+}
+
+.stats-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.stats-card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.stats-card-info .stats-card-icon {
+    background: rgba(0, 188, 212, 0.1);
+    color: #00bcd4;
+}
+
+.stats-card-primary .stats-card-icon {
+    background: rgba(67, 97, 238, 0.1);
+    color: #4361ee;
+}
+
+.stats-card-success .stats-card-icon {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+}
+
+.stats-number {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.stats-label {
+    font-size: 13px;
+    color: var(--gray-color);
+    margin: 0;
+}
+
+.badge-system {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-facs {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.badge-artiva {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.btn {
+    padding: 8px 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--sidebar-start), var(--sidebar-middle));
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-danger:hover {
+    transform: translateY(-2px);
+}
+</style>
+
+<script>
+function rejectApproval(approvalId) {
+    Swal.fire({
+        title: 'Reject Approval?',
+        text: 'Please provide a reason for rejection:',
+        icon: 'warning',
+        input: 'textarea',
+        inputPlaceholder: 'Enter rejection reason...',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, reject it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            fetch(`/letters/${approvalId}/radius/approve/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'reject',
+                    comments: result.value
+                })
+            }).then(response => {
+                if (response.ok) {
+                    Swal.fire('Rejected!', 'The approval has been rejected.', 'success')
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire('Error!', 'Failed to reject approval.', 'error');
+                }
+            });
+        }
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+<!-- Add SweetAlert2 for better modals -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock %}

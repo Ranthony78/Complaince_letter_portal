@@ -1,0 +1,13 @@
+Django==4.2.0
+Pillow==10.0.0
+django-crispy-forms==2.0
+crispy-bootstrap4==2.0
+django-allauth==0.54.0
+djangorestframework==3.14.0
+python-decouple==3.8
+psycopg2-binary==2.9.9
+django-celery-results==2.5.0
+django-celery-beat==2.5.0
+redis==4.5.4
+django-import-export==3.3.0
+django-simple-history==3.3.0
