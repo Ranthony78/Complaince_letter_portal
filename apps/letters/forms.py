@@ -70,7 +70,7 @@ class BaseLetterForm(forms.ModelForm):
         # Common dropdowns
         self.fields['regulatory'].choices = [('', 'Select'), ('Yes', 'Yes'), ('No', 'No')]
         self.fields['timing'].choices = [('', 'Select'), ('Initial', 'Initial'), ('Subsequent', 'Subsequent'), ('Seasonal', 'Seasonal')]
-        self.fields['source'].choices = [('', 'Select'), ('Internal', 'Internal'), ('LiveVox', 'LiveVox'), ('CompuMail', 'CompuMail')]
+        self.fields['source'].choices = [('', 'Select'), ('Internal', 'Internal'), ('LiveVox', 'LiveVox'), ('CompuMail', 'CompuMail'), ('RevSpring', 'RevSpring')]
         self.fields['communication_subtype'].choices = [('', 'Select'), ('Letter', 'Letter'), ('Email', 'Email'), ('SMS', 'SMS')]
         self.fields['priority'].choices = [('', 'Select'), ('Low', 'Low'), ('Medium', 'Medium'), ('High', 'High'), ('Critical', 'Critical')]
 
@@ -178,6 +178,7 @@ class FACSCreationForm(forms.ModelForm):
             ('Internal', 'Internal'),
             ('LiveVox', 'LiveVox'),
             ('CompuMail', 'CompuMail'),
+            ('RevSpring', 'RevSpring'),
         ]
 
         # Set communication subtype choices
@@ -300,6 +301,7 @@ class ArtivaCreationForm(forms.ModelForm):
             ('Internal', 'Internal'),
             ('LiveVox', 'LiveVox'),
             ('CompuMail', 'CompuMail'),
+            ('RevSpring', 'RevSpring'),
         ]
 
         # Set communication subtype choices

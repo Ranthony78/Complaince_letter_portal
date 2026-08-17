@@ -1,0 +1,97 @@
+communication_code,letter_code,timing,regulatory,source,priority,communication_subtype,document_description,letter_description
+ART-IDN000006-0001,ART-IDN000006-0001,Initial,Yes,RevSpring,Medium,Email,IDN000006_Email.docx,Email - Initial Regulatory
+ART-IDN000007-0002,ART-IDN000007-0002,Initial,Yes,RevSpring,Medium,Email,IDN000007_Email.docx,Email - Initial Regulatory
+ART-IDN00010-0003,ART-IDN00010-0003,Initial,Yes,RevSpring,Medium,Email,IDN00010_Email.docx,Email - Initial Regulatory
+ART-IDN00011-0004,ART-IDN00011-0004,Initial,Yes,RevSpring,Medium,Email,IDN00011_Email.docx,Email - Initial Regulatory
+ART-IDNS0001-0005,ART-IDNS0001-0005,Initial,Yes,RevSpring,Medium,Email,IDNS0001_email.docx,Email - Initial Regulatory
+ART-IDNS0010-0006,ART-IDNS0010-0006,Initial,Yes,RevSpring,Medium,Email,IDNS0010_Email.docx,Email - Initial Regulatory
+ART-IDNS0011-0007,ART-IDNS0011-0007,Initial,Yes,RevSpring,Medium,Email,IDNS0011_Email.docx,Email - Initial Regulatory
+ART-IDN00006SP-0008,ART-IDN00006SP-0008,Initial,Yes,RevSpring,Medium,Email,IDN00006SP_Email.docx,Email - Initial Regulatory Spanish
+ART-IDNS00001SP-0009,ART-IDNS00001SP-0009,Initial,Yes,RevSpring,Medium,Email,IDNS00001SP_Email.docx,Email - Initial Regulatory Spanish
+ART-BCN00001-0010,ART-BCN00001-0010,Subsequent,No,RevSpring,Medium,Email,BCN00001_Email.docx,Email - Subsequent Non-Regulatory
+ART-CEN00001-0011,ART-CEN00001-0011,Subsequent,No,RevSpring,Medium,Email,CEN00001_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000001-0012,ART-EM000001-0012,Subsequent,No,RevSpring,Medium,Email,EM000001_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000002-0013,ART-EM000002-0013,Subsequent,No,RevSpring,Medium,Email,EM000002_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000004-0014,ART-EM000004-0014,Subsequent,No,RevSpring,Medium,Email,EM000004_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000005-0015,ART-EM000005-0015,Subsequent,No,RevSpring,Medium,Email,EM000005_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000007-0016,ART-EM000007-0016,Subsequent,No,RevSpring,Medium,Email,EM000007_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000012-0017,ART-EM000012-0017,Subsequent,No,RevSpring,Medium,Email,EM000012_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000014-0018,ART-EM000014-0018,Subsequent,No,RevSpring,Medium,Email,EM000014_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000017-0019,ART-EM000017-0019,Subsequent,No,RevSpring,Medium,Email,EM000017_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000020-0020,ART-EM000020-0020,Subsequent,No,RevSpring,Medium,Email,EM000020_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000023-0021,ART-EM000023-0021,Subsequent,No,RevSpring,Medium,Email,EM000023_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000024-0022,ART-EM000024-0022,Subsequent,No,RevSpring,Medium,Email,EM000024_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000025-0023,ART-EM000025-0023,Subsequent,No,RevSpring,Medium,Email,EM000025_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000026-0024,ART-EM000026-0024,Subsequent,No,RevSpring,Medium,Email,EM000026_Email .docx,Email - Subsequent Non-Regulatory
+ART-EM000027-0025,ART-EM000027-0025,Subsequent,No,RevSpring,Medium,Email,EM000027_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000028-0026,ART-EM000028-0026,Subsequent,No,RevSpring,Medium,Email,EM000028_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000029-0027,ART-EM000029-0027,Subsequent,No,RevSpring,Medium,Email,EM000029_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000030-0028,ART-EM000030-0028,Subsequent,No,RevSpring,Medium,Email,EM000030_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000031-0029,ART-EM000031-0029,Subsequent,No,RevSpring,Medium,Email,EM000031_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000032-0030,ART-EM000032-0030,Subsequent,No,RevSpring,Medium,Email,EM000032_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000033-0031,ART-EM000033-0031,Subsequent,No,RevSpring,Medium,Email,EM000033_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000034-0032,ART-EM000034-0032,Subsequent,No,RevSpring,Medium,Email,EM000034_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM00093R-0033,ART-EM00093R-0033,Subsequent,No,RevSpring,Medium,Email,EM00093R_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM00094R-0034,ART-EM00094R-0034,Subsequent,No,RevSpring,Medium,Email,EM00094R_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM00095R-0035,ART-EM00095R-0035,Subsequent,No,RevSpring,Medium,Email,EM00095R_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM00096R-0036,ART-EM00096R-0036,Subsequent,No,RevSpring,Medium,Email,EM00096R_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM00097R-0037,ART-EM00097R-0037,Subsequent,No,RevSpring,Medium,Email,EM00097R_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM00098R-0038,ART-EM00098R-0038,Subsequent,No,RevSpring,Medium,Email,EM00098R_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM00099R-0039,ART-EM00099R-0039,Subsequent,No,RevSpring,Medium,Email,EM00099R_Email.docx,Email - Subsequent Non-Regulatory
+ART-NCN00001-0040,ART-NCN00001-0040,Subsequent,No,RevSpring,Medium,Email,NCN00001_Email.docx,Email - Subsequent Non-Regulatory
+ART-PFP00001-0041,ART-PFP00001-0041,Subsequent,No,RevSpring,Medium,Email,PFP00001_Email.docx,Email - Subsequent Non-Regulatory
+ART-RTN00001-0042,ART-RTN00001-0042,Subsequent,No,RevSpring,Medium,Email,RTN00001_Email.docx,Email - Subsequent Non-Regulatory
+ART-SCN00001-0043,ART-SCN00001-0043,Subsequent,No,RevSpring,Medium,Email,SCN00001_Email.docx,Email - Subsequent Non-Regulatory
+ART-SCN00001-0044,ART-SCN00001-0044,Subsequent,No,RevSpring,Medium,Email,SCN00001_Spanish.docx,Email - Subsequent Non-Regulatory
+ART-SFGOT002-0045,ART-SFGOT002-0045,Subsequent,No,RevSpring,Medium,Email,SFGOT002_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFGOT003-0046,ART-SFGOT003-0046,Subsequent,No,RevSpring,Medium,Email,SFGOT003_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00001-0047,ART-SFO00001-0047,Subsequent,No,RevSpring,Medium,Email,SFO00001_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00025-0048,ART-SFO00025-0048,Subsequent,No,RevSpring,Medium,Email,SFO00025_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00030-0049,ART-SFO00030-0049,Subsequent,No,RevSpring,Medium,Email,SFO00030_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00035-0050,ART-SFO00035-0050,Subsequent,No,RevSpring,Medium,Email,SFO00035_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00040-0051,ART-SFO00040-0051,Subsequent,No,RevSpring,Medium,Email,SFO00040_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00045-0052,ART-SFO00045-0052,Subsequent,No,RevSpring,Medium,Email,SFO00045_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00050-0053,ART-SFO00050-0053,Subsequent,No,RevSpring,Medium,Email,SFO00050_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00055-0054,ART-SFO00055-0054,Subsequent,No,RevSpring,Medium,Email,SFO00055_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00060-0055,ART-SFO00060-0055,Subsequent,No,RevSpring,Medium,Email,SFO00060_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00065-0056,ART-SFO00065-0056,Subsequent,No,RevSpring,Medium,Email,SFO00065_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00070-0057,ART-SFO00070-0057,Subsequent,No,RevSpring,Medium,Email,SFO00070_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00075-0058,ART-SFO00075-0058,Subsequent,No,RevSpring,Medium,Email,SFO00075_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00080-0059,ART-SFO00080-0059,Subsequent,No,RevSpring,Medium,Email,SFO00080_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00090-0060,ART-SFO00090-0060,Subsequent,No,RevSpring,Medium,Email,SFO00090_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00095-0061,ART-SFO00095-0061,Subsequent,No,RevSpring,Medium,Email,SFO00095_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00P15-0062,ART-SFO00P15-0062,Subsequent,No,RevSpring,Medium,Email,SFO00P15_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO00P34-0063,ART-SFO00P34-0063,Subsequent,No,RevSpring,Medium,Email,SFO00P34_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO12P01-0064,ART-SFO12P01-0064,Subsequent,No,RevSpring,Medium,Email,SFO12P01_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO3P001-0065,ART-SFO3P001-0065,Subsequent,No,RevSpring,Medium,Email,SFO3P001_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO48P15-0066,ART-SFO48P15-0066,Subsequent,No,RevSpring,Medium,Email,SFO48P15_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO48P34-0067,ART-SFO48P34-0067,Subsequent,No,RevSpring,Medium,Email,SFO48P34_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO6P001-0068,ART-SFO6P001-0068,Subsequent,No,RevSpring,Medium,Email,SFO6P001_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFO9P001-0069,ART-SFO9P001-0069,Subsequent,No,RevSpring,Medium,Email,SFO9P001_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFOCO001-0070,ART-SFOCO001-0070,Subsequent,No,RevSpring,Medium,Email,SFOCO001_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFOCO040-0071,ART-SFOCO040-0071,Subsequent,No,RevSpring,Medium,Email,SFOCO040_Email.docx,Email - Subsequent Non-Regulatory
+ART-SFP00001-0072,ART-SFP00001-0072,Subsequent,No,RevSpring,Medium,Email,SFP00001_Email.docx,Email - Subsequent Non-Regulatory
+ART-SGN00001-0073,ART-SGN00001-0073,Subsequent,No,RevSpring,Medium,Email,SGN00001_Email.docx,Email - Subsequent Non-Regulatory
+ART-EM000001SP-0074,ART-EM000001SP-0074,Subsequent,No,RevSpring,Medium,Email,EM000001SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000002SP-0075,ART-EM000002SP-0075,Subsequent,No,RevSpring,Medium,Email,EM000002SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000007SP-0076,ART-EM000007SP-0076,Subsequent,No,RevSpring,Medium,Email,EM000007SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000012SP-0077,ART-EM000012SP-0077,Subsequent,No,RevSpring,Medium,Email,EM000012SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000014SP-0078,ART-EM000014SP-0078,Subsequent,No,RevSpring,Medium,Email,EM000014SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000017SP-0079,ART-EM000017SP-0079,Subsequent,No,RevSpring,Medium,Email,EM000017SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000024SP-0080,ART-EM000024SP-0080,Subsequent,No,RevSpring,Medium,Email,EM000024SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000025SP-0081,ART-EM000025SP-0081,Subsequent,No,RevSpring,Medium,Email,EM000025SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000027SP-0082,ART-EM000027SP-0082,Subsequent,No,RevSpring,Medium,Email,EM000027SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000029SP-0083,ART-EM000029SP-0083,Subsequent,No,RevSpring,Medium,Email,EM000029SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000031SP-0084,ART-EM000031SP-0084,Subsequent,No,RevSpring,Medium,Email,EM000031SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-EM000032SP-0085,ART-EM000032SP-0085,Subsequent,No,RevSpring,Medium,Email,EM000032SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-NCN00001SP-0086,ART-NCN00001SP-0086,Subsequent,No,RevSpring,Medium,Email,NCN00001SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-PFP00001SP-0087,ART-PFP00001SP-0087,Subsequent,No,RevSpring,Medium,Email,PFP00001SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-SCN00001SP-0088,ART-SCN00001SP-0088,Subsequent,No,RevSpring,Medium,Email,SCN00001SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-SFGOT003SP-0089,ART-SFGOT003SP-0089,Subsequent,No,RevSpring,Medium,Email,SFGOT003SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-SFO00001SP-0090,ART-SFO00001SP-0090,Subsequent,No,RevSpring,Medium,Email,SFO00001SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-SFO00045SP-0091,ART-SFO00045SP-0091,Subsequent,No,RevSpring,Medium,Email,SFO00045SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-SFO00050SP-0092,ART-SFO00050SP-0092,Subsequent,No,RevSpring,Medium,Email,SFO00050SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-SFO00055SP-0093,ART-SFO00055SP-0093,Subsequent,No,RevSpring,Medium,Email,SFO00055SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-SFO00060SP-0094,ART-SFO00060SP-0094,Subsequent,No,RevSpring,Medium,Email,SFO00060SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-SFP00001SP-0095,ART-SFP00001SP-0095,Subsequent,No,RevSpring,Medium,Email,SFP00001SP_Email.docx,Email - Subsequent Non-Regulatory Spanish
+ART-PDR00001-0096,ART-PDR00001-0096,Subsequent,Yes,RevSpring,Medium,Email,PDR00001_Email.docx,Email - Subsequent Regulatory

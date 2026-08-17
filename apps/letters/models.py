@@ -291,6 +291,7 @@ class FACSLetters(BaseLetter):
             ('Internal', 'Internal'),
             ('LiveVox', 'LiveVox'),
             ('CompuMail', 'CompuMail'),
+            ('RevSpring', 'RevSpring'),
         ],
         default='',
         verbose_name='Source'
@@ -458,6 +459,7 @@ class ArtivaLetters(BaseLetter):
             ('Internal', 'Internal'),
             ('LiveVox', 'LiveVox'),
             ('CompuMail', 'CompuMail'),
+            ('RevSpring', 'RevSpring'),
         ],
         default='',
         blank=True,

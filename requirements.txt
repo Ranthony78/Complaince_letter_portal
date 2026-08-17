@@ -11,3 +11,15 @@ django-celery-beat==2.5.0
 redis==4.5.4
 django-import-export==3.3.0
 django-simple-history==3.3.0
+
+
+
+pip install django-crispy-forms
+pip install django
+pip install crispy_bootstrap5
+pip install djangorestframework
+pip install django-import-export
+pip install django-simple-history
+pip install django-filter
+pip install django-cors-headers
+pip install mysqlclient
